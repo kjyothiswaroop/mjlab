@@ -59,7 +59,7 @@
     <link rel="prev" title="Observation History and Delay" href="observation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Feb 14, 2026"/>
+    <meta name="docbuild:last-update" content="Feb 15, 2026"/>
   </head>
   
   
@@ -482,7 +482,10 @@ document.write(`
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-actuators-in-environments">Using Actuators in Environments</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#action-terms">Action Terms</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#action-terms">Action Terms</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#differential-ik-action">Differential IK Action</a></li>
+</ul>
+</li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#domain-randomization">Domain Randomization</a></li>
 </ul>
 </li>
@@ -971,10 +974,63 @@ sum of the individual motor armatures:</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">JointPositionAction</span></code>: Sets position targets (for PD actuators)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">JointVelocityAction</span></code>: Sets velocity targets (for velocity actuators)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">JointEffortAction</span></code>: Sets effort/torque targets (for torque actuators)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DifferentialIKAction</span></code>: Task-space control via damped least-squares IK</p></li>
 </ul>
 <p>The action manager calls <code class="docutils literal notranslate"><span class="pre">entity.set_joint_position_target()</span></code>,
 <code class="docutils literal notranslate"><span class="pre">set_joint_velocity_target()</span></code>, or <code class="docutils literal notranslate"><span class="pre">set_joint_effort_target()</span></code> under the hood,
 which populate the <code class="docutils literal notranslate"><span class="pre">ActuatorCmd</span></code> passed to each actuator’s <code class="docutils literal notranslate"><span class="pre">compute()</span></code> method.</p>
+<section id="differential-ik-action">
+<h4>Differential IK Action<a class="headerlink" href="#differential-ik-action" title="Link to this heading">#</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">DifferentialIKAction</span></code> converts task-space commands (Cartesian position
+and/or orientation) into joint-space targets via damped least-squares (DLS)
+inverse kinematics. It runs one IK step per decimation substep via
+<code class="docutils literal notranslate"><span class="pre">apply_actions()</span></code>, or can be iterated externally via <code class="docutils literal notranslate"><span class="pre">compute_dq()</span></code>.</p>
+<p>The action dimension is determined automatically by the active objectives:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">orientation_weight</span> <span class="pre">==</span> <span class="pre">0</span></code> → <strong>3D</strong> (position only)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">orientation_weight</span> <span class="pre">&gt;</span> <span class="pre">0,</span> <span class="pre">use_relative_mode=True</span></code> → <strong>6D</strong> (delta pos +
+delta axis-angle)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">orientation_weight</span> <span class="pre">&gt;</span> <span class="pre">0,</span> <span class="pre">use_relative_mode=False</span></code> → <strong>7D</strong> (absolute
+pos + quaternion)</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.envs.mdp.actions</span><span class="w"> </span><span class="kn">import</span> <span class="n">DifferentialIKActionCfg</span>
+
+<span class="n">DifferentialIKActionCfg</span><span class="p">(</span>
+    <span class="n">entity_name</span><span class="o">=</span><span class="s2">&quot;robot&quot;</span><span class="p">,</span>
+    <span class="n">actuator_names</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;joint.*&quot;</span><span class="p">,),</span>   <span class="c1"># Regex for controlled joints</span>
+    <span class="n">frame_name</span><span class="o">=</span><span class="s2">&quot;grasp_site&quot;</span><span class="p">,</span>       <span class="c1"># End-effector element name</span>
+    <span class="n">frame_type</span><span class="o">=</span><span class="s2">&quot;site&quot;</span><span class="p">,</span>             <span class="c1"># &quot;body&quot;, &quot;site&quot;, or &quot;geom&quot;</span>
+    <span class="n">use_relative_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>       <span class="c1"># Absolute target mode</span>
+    <span class="n">damping</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>                  <span class="c1"># DLS damping (lambda)</span>
+    <span class="n">max_dq</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>                    <span class="c1"># Per-step joint displacement limit</span>
+    <span class="n">position_weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>           <span class="c1"># Position tracking weight</span>
+    <span class="n">orientation_weight</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>        <span class="c1"># Orientation tracking weight</span>
+    <span class="n">joint_limit_weight</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>        <span class="c1"># Soft joint-limit avoidance</span>
+    <span class="n">posture_weight</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>            <span class="c1"># Null-space posture regularization</span>
+    <span class="n">posture_target</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;.*&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>    <span class="c1"># Posture target (regex → value)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Standalone usage (outside RL):</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">compute_dq()</span></code> method returns joint displacements without writing to
+actuator targets, enabling multi-iteration IK in standalone scripts:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.envs.mdp.actions</span><span class="w"> </span><span class="kn">import</span> <span class="n">DifferentialIKAction</span>
+
+<span class="n">action</span><span class="p">:</span> <span class="n">DifferentialIKAction</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+<span class="n">action</span><span class="o">.</span><span class="n">process_actions</span><span class="p">(</span><span class="n">target_pose</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>  <span class="c1"># Multiple IK iterations</span>
+    <span class="n">dq</span> <span class="o">=</span> <span class="n">action</span><span class="o">.</span><span class="n">compute_dq</span><span class="p">()</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">joint_pos</span><span class="p">[:,</span> <span class="n">action</span><span class="o">.</span><span class="n">_joint_ids</span><span class="p">]</span> <span class="o">+</span> <span class="n">dq</span>
+    <span class="n">entity</span><span class="o">.</span><span class="n">write_joint_position_to_sim</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">joint_ids</span><span class="o">=</span><span class="n">action</span><span class="o">.</span><span class="n">_joint_ids</span><span class="p">)</span>
+    <span class="n">sim</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><strong>Weighted objectives:</strong></p>
+<p>All objectives (position, orientation, joint limits, posture) are stacked
+into a single DLS system. Setting a weight to zero disables that objective
+with no overhead in the solve. Weights can be changed at runtime (e.g. from
+GUI sliders in the <code class="docutils literal notranslate"><span class="pre">scripts/demos/ik_control.py</span></code> demo).</p>
+</section>
 </section>
 <section id="domain-randomization">
 <h3>Domain Randomization<a class="headerlink" href="#domain-randomization" title="Link to this heading">#</a></h3>
@@ -1075,7 +1131,10 @@ which populate the <code class="docutils literal notranslate"><span class="pre">
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-actuators-in-environments">Using Actuators in Environments</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#action-terms">Action Terms</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#action-terms">Action Terms</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#differential-ik-action">Differential IK Action</a></li>
+</ul>
+</li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#domain-randomization">Domain Randomization</a></li>
 </ul>
 </li>
@@ -1112,7 +1171,7 @@ By The mjlab Developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Feb 14, 2026.
+  Last updated on Feb 15, 2026.
   <br/>
 </p>
   </div>
