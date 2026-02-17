@@ -59,7 +59,7 @@
     <link rel="prev" title="FAQ &amp; Troubleshooting" href="faq.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Feb 16, 2026"/>
+    <meta name="docbuild:last-update" content="Feb 17, 2026"/>
   </head>
   
   
@@ -431,14 +431,14 @@ document.write(`
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-1-1-february-14-2026">Version 1.1.1 (February 14, 2026)</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#added">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Fixed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Changed</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-1-0-february-12-2026">Version 1.1.0 (February 12, 2026)</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Changed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">Fixed</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-0-0-january-28-2026">Version 1.0.0 (January 28, 2026)</a></li>
@@ -474,7 +474,7 @@ in the velocity task config. Thanks to <a class="reference external" href="https
 for reporting and the initial fix (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/642">#642</a>).</p></li>
 <li><p>Fixed ghost mesh visualization for fixed-base entities by extending
 <code class="docutils literal notranslate"><span class="pre">DebugVisualizer.add_ghost_mesh</span></code> to optionally accept <code class="docutils literal notranslate"><span class="pre">mocap_pos</span></code> and
-<code class="docutils literal notranslate"><span class="pre">mocap_quat</span></code>.</p></li>
+<code class="docutils literal notranslate"><span class="pre">mocap_quat</span></code> (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/645">#645</a>).</p></li>
 </ul>
 </section>
 </section>
@@ -483,31 +483,31 @@ for reporting and the initial fix (<a class="reference external" href="https://g
 <section id="added">
 <h3>Added<a class="headerlink" href="#added" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p>Added reward term visualization to the native viewer (toggle with <code class="docutils literal notranslate"><span class="pre">P</span></code>).</p></li>
+<li><p>Added reward term visualization to the native viewer (toggle with <code class="docutils literal notranslate"><span class="pre">P</span></code>) (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/629">#629</a>).</p></li>
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">DifferentialIKAction</span></code> for task-space control via damped
 least-squares IK. Supports weighted position/orientation tracking,
 soft joint-limit avoidance, and null-space posture regularization.
-Includes an interactive viser demo (<code class="docutils literal notranslate"><span class="pre">scripts/demos/differential_ik.py</span></code>).</p></li>
+Includes an interactive viser demo (<code class="docutils literal notranslate"><span class="pre">scripts/demos/differential_ik.py</span></code>) (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/632">#632</a>).</p></li>
 </ul>
 </section>
-<section id="id2">
-<h3>Fixed<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<section id="id5">
+<h3>Fixed<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fixed <code class="docutils literal notranslate"><span class="pre">play.py</span></code> defaulting to the base rsl-rl <code class="docutils literal notranslate"><span class="pre">OnPolicyRunner</span></code> instead
 of <code class="docutils literal notranslate"><span class="pre">MjlabOnPolicyRunner</span></code>, which caused a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code> from an unexpected
-<code class="docutils literal notranslate"><span class="pre">cnn_cfg</span></code> keyword argument. Contribution by
+<code class="docutils literal notranslate"><span class="pre">cnn_cfg</span></code> keyword argument (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/626">#626</a>). Contribution by
 <a class="reference external" href="https://github.com/griffinaddison">&#64;griffinaddison</a>.</p></li>
 </ul>
 </section>
-<section id="id3">
-<h3>Changed<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<section id="id7">
+<h3>Changed<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Removed <code class="docutils literal notranslate"><span class="pre">body_mass</span></code>, <code class="docutils literal notranslate"><span class="pre">body_inertia</span></code>, <code class="docutils literal notranslate"><span class="pre">body_pos</span></code>, and <code class="docutils literal notranslate"><span class="pre">body_quat</span></code>
 from <code class="docutils literal notranslate"><span class="pre">FIELD_SPECS</span></code> in domain randomization. These fields have derived
 quantities that require <code class="docutils literal notranslate"><span class="pre">set_const</span></code> to recompute; without that call,
-randomizing them silently breaks physics.</p></li>
+randomizing them silently breaks physics (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/631">#631</a>).</p></li>
 <li><p>Replaced <code class="docutils literal notranslate"><span class="pre">moviepy</span></code> with <code class="docutils literal notranslate"><span class="pre">mediapy</span></code> for video recording. <code class="docutils literal notranslate"><span class="pre">mediapy</span></code>
-handles cloud storage paths (GCS, S3) natively.</p></li>
+handles cloud storage paths (GCS, S3) natively (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/637">#637</a>).</p></li>
 </ul>
 <figure class="align-default">
 <a class="reference internal image-reference" href="../_images/native_reward.png"><img alt="../_images/native_reward.png" src="../_images/native_reward.png" style="width: 80%;" />
@@ -517,12 +517,12 @@ handles cloud storage paths (GCS, S3) natively.</p></li>
 </section>
 <section id="version-1-1-0-february-12-2026">
 <h2>Version 1.1.0 (February 12, 2026)<a class="headerlink" href="#version-1-1-0-february-12-2026" title="Link to this heading">#</a></h2>
-<section id="id4">
-<h3>Added<a class="headerlink" href="#id4" title="Link to this heading">#</a></h3>
+<section id="id10">
+<h3>Added<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p>Added RGB and depth camera sensors and BVH-accelerated raycasting.</p></li>
-<li><p>Added <code class="docutils literal notranslate"><span class="pre">MetricsManager</span></code> for logging custom metrics during training.</p></li>
-<li><p>Added terrain visualizer. Contribution by
+<li><p>Added RGB and depth camera sensors and BVH-accelerated raycasting (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/597">#597</a>).</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">MetricsManager</span></code> for logging custom metrics during training (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/596">#596</a>).</p></li>
+<li><p>Added terrain visualizer (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/609">#609</a>). Contribution by
 <a class="reference external" href="https://github.com/mktk1117">&#64;mktk1117</a>.</p></li>
 </ul>
 <figure class="align-default">
@@ -533,33 +533,33 @@ handles cloud storage paths (GCS, S3) natively.</p></li>
 <li><p>Added many new terrains including <code class="docutils literal notranslate"><span class="pre">HfDiscreteObstaclesTerrainCfg</span></code>,
 <code class="docutils literal notranslate"><span class="pre">HfPerlinNoiseTerrainCfg</span></code>, <code class="docutils literal notranslate"><span class="pre">BoxSteppingStonesTerrainCfg</span></code>,
 <code class="docutils literal notranslate"><span class="pre">BoxNarrowBeamsTerrainCfg</span></code>, <code class="docutils literal notranslate"><span class="pre">BoxRandomStairsTerrainCfg</span></code>, and
-more. Added flat patch sampling for heightfield terrains.</p></li>
+more. Added flat patch sampling for heightfield terrains (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/542">#542</a>, <a class="reference external" href="https://github.com/mujocolab/mjlab/pull/581">#581</a>).</p></li>
 <li><p>Added site group visualization to the Viser viewer (Geoms and Sites
-tabs unified into a single Groups tab).</p></li>
-<li><p>Added <code class="docutils literal notranslate"><span class="pre">env_ids</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">Entity.write_ctrl_to_sim</span></code>.</p></li>
+tabs unified into a single Groups tab) (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/551">#551</a>).</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">env_ids</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">Entity.write_ctrl_to_sim</span></code> (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/567">#567</a>).</p></li>
 </ul>
 </section>
-<section id="id5">
-<h3>Changed<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
+<section id="id18">
+<h3>Changed<a class="headerlink" href="#id18" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Upgraded <code class="docutils literal notranslate"><span class="pre">rsl-rl-lib</span></code> to 4.0.0 and replaced the custom ONNX
-exporter with rsl-rl’s built-in <code class="docutils literal notranslate"><span class="pre">as_onnx()</span></code>.</p></li>
+exporter with rsl-rl’s built-in <code class="docutils literal notranslate"><span class="pre">as_onnx()</span></code> (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/589">#589</a>, <a class="reference external" href="https://github.com/mujocolab/mjlab/pull/595">#595</a>).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">sim.forward()</span></code> is now called unconditionally after the decimation
-loop. See <a class="reference internal" href="faq.html#faq-sim-forward"><span class="std std-ref">When do I need to call sim.forward()?</span></a> for details.</p></li>
+loop. See <a class="reference internal" href="faq.html#faq-sim-forward"><span class="std std-ref">When do I need to call sim.forward()?</span></a> for details (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/591">#591</a>).</p></li>
 <li><p>Unnamed freejoints are now automatically named to prevent
-<code class="docutils literal notranslate"><span class="pre">KeyError</span></code> during entity init.</p></li>
+<code class="docutils literal notranslate"><span class="pre">KeyError</span></code> during entity init (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/545">#545</a>).</p></li>
 </ul>
 </section>
-<section id="id6">
-<h3>Fixed<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
+<section id="id23">
+<h3>Fixed<a class="headerlink" href="#id23" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">randomize_pd_gains</span></code> crash with <code class="docutils literal notranslate"><span class="pre">num_envs</span> <span class="pre">&gt;</span> <span class="pre">1</span></code>.</p></li>
-<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">ctrl_ids</span></code> index error with multiple actuated entities.
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">randomize_pd_gains</span></code> crash with <code class="docutils literal notranslate"><span class="pre">num_envs</span> <span class="pre">&gt;</span> <span class="pre">1</span></code> (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/564">#564</a>).</p></li>
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">ctrl_ids</span></code> index error with multiple actuated entities (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/573">#573</a>).
 Reported by <a class="reference external" href="https://github.com/bwrooney82">&#64;bwrooney82</a>.</p></li>
-<li><p>Fixed Viser viewer rendering textured robots as gray.</p></li>
-<li><p>Fixed Viser plane rendering ignoring MuJoCo size parameter.</p></li>
-<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">HfDiscreteObstaclesTerrainCfg</span></code> spawn height.</p></li>
-<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">RaycastSensor</span></code> visualization ignoring the all-envs toggle.
+<li><p>Fixed Viser viewer rendering textured robots as gray (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/544">#544</a>).</p></li>
+<li><p>Fixed Viser plane rendering ignoring MuJoCo size parameter (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/540">#540</a>).</p></li>
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">HfDiscreteObstaclesTerrainCfg</span></code> spawn height (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/552">#552</a>).</p></li>
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">RaycastSensor</span></code> visualization ignoring the all-envs toggle (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/607">#607</a>).
 Contribution by <a class="reference external" href="https://github.com/oxkitsune">&#64;oxkitsune</a>.</p></li>
 </ul>
 </section>
@@ -622,14 +622,14 @@ Contribution by <a class="reference external" href="https://github.com/oxkitsune
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-1-1-february-14-2026">Version 1.1.1 (February 14, 2026)</a><ul class="visible nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#added">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Fixed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Changed</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-1-0-february-12-2026">Version 1.1.0 (February 12, 2026)</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">Added</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Changed</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">Fixed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Added</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">Changed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">Fixed</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#version-1-0-0-january-28-2026">Version 1.0.0 (January 28, 2026)</a></li>
@@ -666,7 +666,7 @@ By The mjlab Developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Feb 16, 2026.
+  Last updated on Feb 17, 2026.
   <br/>
 </p>
   </div>
