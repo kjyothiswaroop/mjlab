@@ -59,7 +59,7 @@
     <link rel="prev" title="Installation Guide" href="installation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Feb 22, 2026"/>
+    <meta name="docbuild:last-update" content="Feb 23, 2026"/>
   </head>
   
   
@@ -569,7 +569,7 @@ it easy to construct variants, merge configs, or generate them programmatically.
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for the terrain scene with a legged robot.&quot;&quot;&quot;</span>
 
     <span class="c1"># ground terrain</span>
-    <span class="n">terrain</span> <span class="o">=</span> <span class="n">TerrainImporterCfg</span><span class="p">(</span>
+    <span class="n">terrain</span> <span class="o">=</span> <span class="n">TerrainEntityCfg</span><span class="p">(</span>
         <span class="n">prim_path</span><span class="o">=</span><span class="s2">&quot;/World/ground&quot;</span><span class="p">,</span>
         <span class="n">terrain_type</span><span class="o">=</span><span class="s2">&quot;plane&quot;</span><span class="p">,</span>
         <span class="n">collision_group</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
@@ -606,7 +606,7 @@ it easy to construct variants, merge configs, or generate them programmatically.
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.scene</span><span class="w"> </span><span class="kn">import</span> <span class="n">SceneCfg</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.asset_zoo.robots.unitree_g1.g1_constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_g1_robot_cfg</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.utils.spec_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContactSensorCfg</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.terrains</span><span class="w"> </span><span class="kn">import</span> <span class="n">TerrainImporterCfg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.terrains</span><span class="w"> </span><span class="kn">import</span> <span class="n">TerrainEntityCfg</span>
 
 <span class="c1"># Configure contact sensor</span>
 <span class="n">self_collision_sensor</span> <span class="o">=</span> <span class="n">ContactSensorCfg</span><span class="p">(</span>
@@ -623,7 +623,7 @@ it easy to construct variants, merge configs, or generate them programmatically.
 
 <span class="c1"># Create scene</span>
 <span class="n">SCENE_CFG</span> <span class="o">=</span> <span class="n">SceneCfg</span><span class="p">(</span>
-    <span class="n">terrain</span><span class="o">=</span><span class="n">TerrainImporterCfg</span><span class="p">(</span><span class="n">terrain_type</span><span class="o">=</span><span class="s2">&quot;plane&quot;</span><span class="p">),</span>
+    <span class="n">terrain</span><span class="o">=</span><span class="n">TerrainEntityCfg</span><span class="p">(</span><span class="n">terrain_type</span><span class="o">=</span><span class="s2">&quot;plane&quot;</span><span class="p">),</span>
     <span class="n">entities</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;robot&quot;</span><span class="p">:</span> <span class="n">g1_cfg</span><span class="p">},</span>
 <span class="p">)</span>
 </pre></div>
@@ -817,7 +817,7 @@ By The mjlab Developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Feb 22, 2026.
+  Last updated on Feb 23, 2026.
   <br/>
 </p>
   </div>

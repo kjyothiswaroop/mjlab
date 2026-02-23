@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mjlab.terrains.terrain_importer &#8212; mjlab Documentation</title>
+    <title>mjlab.terrains.terrain_entity &#8212; mjlab Documentation</title>
   
   
   
@@ -50,7 +50,7 @@
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/mjlab/terrains/terrain_importer';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/mjlab/terrains/terrain_entity';</script>
     <link rel="icon" href="../../../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -168,8 +168,8 @@
 <div class="sidebar-version-switcher">
   <label class="sidebar-version-label" for="version-select">Version</label>
   <select id="version-select" class="sidebar-version-select" onchange="location = this.value;">
-    <option value="../../../../main/index.html" >main</option>
-    <option value="terrain_importer.html" selected>v1.1.1</option>
+    <option value="terrain_entity.html" selected>main</option>
+    <option value="../../../../v1.1.1/index.html" >v1.1.1</option>
     <option value="../../../../v1.1.0/index.html" >v1.1.0</option>
     <option value="../../../../v1.0.0/index.html" >v1.0.0</option>
   </select>
@@ -282,7 +282,7 @@
       
       
       
-      <li><a href="https://github.com/mujocolab/mjlab/issues/new?title=Issue%20on%20page%20%2F_modules/mjlab/terrains/terrain_importer.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/mujocolab/mjlab/issues/new?title=Issue%20on%20page%20%2F_modules/mjlab/terrains/terrain_entity.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -360,7 +360,7 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <h1>Source code for mjlab.terrains.terrain_importer</h1><div class="highlight"><pre>
+  <h1>Source code for mjlab.terrains.terrain_entity</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
@@ -370,6 +370,7 @@ document.write(`
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.entity</span><span class="w"> </span><span class="kn">import</span> <span class="n">Entity</span><span class="p">,</span> <span class="n">EntityCfg</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.terrains.terrain_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">TerrainGenerator</span><span class="p">,</span> <span class="n">TerrainGeneratorCfg</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">spec_config</span> <span class="k">as</span> <span class="n">spec_cfg</span>
 
@@ -394,11 +395,11 @@ document.write(`
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="TerrainImporterCfg">
-<a class="viewcode-back" href="../../../source/api/terrains.html#mjlab.terrains.TerrainImporterCfg">[docs]</a>
+<div class="viewcode-block" id="TerrainEntityCfg">
+<a class="viewcode-back" href="../../../source/api/terrains.html#mjlab.terrains.TerrainEntityCfg">[docs]</a>
 <span class="nd">@dataclass</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">TerrainImporterCfg</span><span class="p">:</span>
-<span class="w">  </span><span class="sd">&quot;&quot;&quot;Configuration for terrain import and environment placement.&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TerrainEntityCfg</span><span class="p">(</span><span class="n">EntityCfg</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Configuration for terrain as an entity.&quot;&quot;&quot;</span>
 
   <span class="n">terrain_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;generator&quot;</span><span class="p">,</span> <span class="s2">&quot;plane&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;plane&quot;</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;Type of terrain to generate. &quot;generator&quot; uses procedural terrain with</span>
@@ -414,14 +415,23 @@ document.write(`
 <span class="sd">  curriculum mode. None uses all available rows.&quot;&quot;&quot;</span>
   <span class="n">num_envs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;Number of parallel environments to create. This will get overridden by the</span>
-<span class="sd">  scene configuration if specified there.&quot;&quot;&quot;</span></div>
+<span class="sd">  scene configuration if specified there.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TerrainEntityCfg.build">
+<a class="viewcode-back" href="../../../source/api/terrains.html#mjlab.terrains.TerrainEntityCfg.build">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TerrainEntity</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+      <span class="s2">&quot;TerrainEntityCfg.build() requires a device argument. &quot;</span>
+      <span class="s2">&quot;Use TerrainEntity(cfg, device=...) directly.&quot;</span>
+    <span class="p">)</span></div>
+</div>
 
 
 
-<div class="viewcode-block" id="TerrainImporter">
-<a class="viewcode-back" href="../../../source/api/terrains.html#mjlab.terrains.TerrainImporter">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">TerrainImporter</span><span class="p">:</span>
-<span class="w">  </span><span class="sd">&quot;&quot;&quot;Builds a MuJoCo spec with terrain geometry and maps environments to spawn origins.</span>
+<div class="viewcode-block" id="TerrainEntity">
+<a class="viewcode-back" href="../../../source/api/terrains.html#mjlab.terrains.TerrainEntity">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TerrainEntity</span><span class="p">(</span><span class="n">Entity</span><span class="p">):</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Terrain entity.</span>
 
 <span class="sd">  The terrain is a grid of sub-terrain patches (num_rows x num_cols), each with</span>
 <span class="sd">  a spawn origin. When num_envs exceeds the number of patches, environment</span>
@@ -436,39 +446,38 @@ document.write(`
 <span class="sd">  See FAQ: &quot;How does env_origins determine robot layout?&quot;</span>
 <span class="sd">  &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TerrainImporter.__init__">
-<a class="viewcode-back" href="../../../source/api/terrains.html#mjlab.terrains.TerrainImporter.__init__">[docs]</a>
-  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">TerrainImporterCfg</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">cfg</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">device</span>
+  <span class="n">cfg</span><span class="p">:</span> <span class="n">TerrainEntityCfg</span>
+
+<div class="viewcode-block" id="TerrainEntity.__init__">
+<a class="viewcode-back" href="../../../source/api/terrains.html#mjlab.terrains.TerrainEntity.__init__">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">TerrainEntityCfg</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_device</span> <span class="o">=</span> <span class="n">device</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span></div>
+
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_build_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_spec</span> <span class="o">=</span> <span class="n">mujoco</span><span class="o">.</span><span class="n">MjSpec</span><span class="p">()</span>
-
-    <span class="c1"># The origins of the environments. Shape is (num_envs, 3).</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span> <span class="o">=</span> <span class="kc">None</span>
-
-    <span class="c1"># Origins of the sub-terrains. Shape is (num_rows, num_cols, 3).</span>
-    <span class="c1"># If terrain origins is not None, the environment origins are computed based on the</span>
-    <span class="c1"># terrain origins. Otherwise, the origins are computed based on grid spacing.</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">terrain_type</span> <span class="o">==</span> <span class="s2">&quot;generator&quot;</span><span class="p">:</span>
       <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">terrain_generator</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
           <span class="s2">&quot;terrain_generator must be specified for terrain_type &#39;generator&#39;&quot;</span>
         <span class="p">)</span>
-      <span class="n">terrain_generator</span> <span class="o">=</span> <span class="n">TerrainGenerator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">terrain_generator</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+      <span class="n">terrain_generator</span> <span class="o">=</span> <span class="n">TerrainGenerator</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">terrain_generator</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_device</span>
+      <span class="p">)</span>
       <span class="n">terrain_generator</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="p">)</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">configure_env_origins</span><span class="p">(</span><span class="n">terrain_generator</span><span class="o">.</span><span class="n">terrain_origins</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_configure_env_origins</span><span class="p">(</span><span class="n">terrain_generator</span><span class="o">.</span><span class="n">terrain_origins</span><span class="p">)</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_flat_patches</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">name</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">arr</span> <span class="ow">in</span> <span class="n">terrain_generator</span><span class="o">.</span><span class="n">flat_patches</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
       <span class="p">}</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_flat_patch_radii</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
         <span class="n">terrain_generator</span><span class="o">.</span><span class="n">flat_patch_radii</span>
       <span class="p">)</span>
     <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">terrain_type</span> <span class="o">==</span> <span class="s2">&quot;plane&quot;</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">import_ground_plane</span><span class="p">(</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">configure_env_origins</span><span class="p">()</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_import_ground_plane</span><span class="p">(</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_configure_env_origins</span><span class="p">()</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_flat_patches</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_flat_patch_radii</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">else</span><span class="p">:</span>
@@ -476,23 +485,121 @@ document.write(`
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_add_env_origin_sites</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_add_terrain_origin_sites</span><span class="p">()</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_add_flat_patch_sites</span><span class="p">()</span></div>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_add_flat_patch_sites</span><span class="p">()</span>
 
+  <span class="k">def</span><span class="w"> </span><span class="nf">_add_initial_state_keyframe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">pass</span>  <span class="c1"># No joints, no keyframe.</span>
+
+  <span class="c1"># Terrain-specific properties.</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">flat_patches</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flat_patches</span>
+
+  <span class="nd">@property</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">flat_patch_radii</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flat_patch_radii</span>
+
+  <span class="c1"># Terrain origin management.</span>
+
+<div class="viewcode-block" id="TerrainEntity.configure_env_origins">
+<a class="viewcode-back" href="../../../source/api/terrains.html#mjlab.terrains.TerrainEntity.configure_env_origins">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">configure_env_origins</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">origins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+  <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configure the origins of the environments based on the terrain.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_configure_env_origins</span><span class="p">(</span><span class="n">origins</span><span class="p">)</span></div>
+
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_configure_env_origins</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">origins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+  <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">origins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">origins</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">origins</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">origins</span><span class="p">)</span>
+      <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">origins</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span> <span class="o">=</span> <span class="n">origins</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_env_origins_curriculum</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">num_envs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span>
+      <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span> <span class="o">=</span> <span class="kc">None</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">env_spacing</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+          <span class="s2">&quot;Environment spacing must be specified for configuring grid-like origins.&quot;</span>
+        <span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_env_origins_grid</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">num_envs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">env_spacing</span>
+      <span class="p">)</span>
+
+<div class="viewcode-block" id="TerrainEntity.update_env_origins">
+<a class="viewcode-back" href="../../../source/api/terrains.html#mjlab.terrains.TerrainEntity.update_env_origins">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">update_env_origins</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">env_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">move_up</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">move_down</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+  <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Update the environment origins based on the terrain levels.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">return</span>
+    <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">move_up</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">move_down</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_terrain_level</span><span class="p">,</span>
+      <span class="n">torch</span><span class="o">.</span><span class="n">randint_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">[</span><span class="n">env_ids</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_terrain_level</span><span class="p">),</span>
+      <span class="n">torch</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">[</span><span class="n">env_ids</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span><span class="p">[</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">[</span><span class="n">env_ids</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_types</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TerrainEntity.randomize_env_origins">
+<a class="viewcode-back" href="../../../source/api/terrains.html#mjlab.terrains.TerrainEntity.randomize_env_origins">[docs]</a>
+  <span class="k">def</span><span class="w"> </span><span class="nf">randomize_env_origins</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Randomize the environment origins to random sub-terrains.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">return</span>
+    <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="n">num_rows</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">num_envs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">env_ids</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span>
+      <span class="mi">0</span><span class="p">,</span> <span class="n">num_rows</span><span class="p">,</span> <span class="p">(</span><span class="n">num_envs</span><span class="p">,),</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_device</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">terrain_types</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span>
+      <span class="mi">0</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">,</span> <span class="p">(</span><span class="n">num_envs</span><span class="p">,),</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_device</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span><span class="p">[</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">[</span><span class="n">env_ids</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_types</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span>
+    <span class="p">]</span></div>
+
+
+  <span class="c1"># Private methods.</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_import_ground_plane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">_DEFAULT_PLANE_TEXTURE</span><span class="o">.</span><span class="n">edit_spec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="p">)</span>
+    <span class="n">_DEFAULT_PLANE_MATERIAL</span><span class="o">.</span><span class="n">edit_spec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="o">.</span><span class="n">worldbody</span><span class="o">.</span><span class="n">add_body</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">add_geom</span><span class="p">(</span>
+      <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+      <span class="nb">type</span><span class="o">=</span><span class="n">mujoco</span><span class="o">.</span><span class="n">mjtGeom</span><span class="o">.</span><span class="n">mjGEOM_PLANE</span><span class="p">,</span>
+      <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">),</span>
+      <span class="n">material</span><span class="o">=</span><span class="n">_DEFAULT_PLANE_MATERIAL</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">spec_cfg</span><span class="o">.</span><span class="n">LightCfg</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;sun&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;directional&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">edit_spec</span><span class="p">(</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_spec</span>
+    <span class="p">)</span>
 
   <span class="k">def</span><span class="w"> </span><span class="nf">_add_env_origin_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add transparent sphere sites at each environment origin for visualization.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
       <span class="k">return</span>
-
     <span class="n">origin_site_radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span>
-    <span class="n">origin_site_color</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
-
-    <span class="c1"># Convert torch tensor to numpy if needed</span>
+    <span class="n">origin_site_color</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
       <span class="n">env_origins_np</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="n">env_origins_np</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span>
-
     <span class="k">for</span> <span class="n">env_id</span><span class="p">,</span> <span class="n">origin</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">env_origins_np</span><span class="p">):</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="o">.</span><span class="n">worldbody</span><span class="o">.</span><span class="n">add_site</span><span class="p">(</span>
         <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;env_origin_</span><span class="si">{</span><span class="n">env_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
@@ -504,20 +611,14 @@ document.write(`
       <span class="p">)</span>
 
   <span class="k">def</span><span class="w"> </span><span class="nf">_add_terrain_origin_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add transparent sphere sites at each terrain origin for visualization.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
       <span class="k">return</span>
-
-    <span class="c1"># Convert torch tensor to numpy if needed</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
       <span class="n">terrain_origins_np</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
       <span class="n">terrain_origins_np</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span>
-
     <span class="n">terrain_origin_site_radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>
-    <span class="n">terrain_origin_site_color</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
-
-    <span class="c1"># Iterate through the 2D grid of terrain origins</span>
+    <span class="n">terrain_origin_site_color</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
     <span class="n">num_rows</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="n">terrain_origins_np</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_rows</span><span class="p">):</span>
       <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_cols</span><span class="p">):</span>
@@ -532,7 +633,6 @@ document.write(`
         <span class="p">)</span>
 
   <span class="k">def</span><span class="w"> </span><span class="nf">_add_flat_patch_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add transparent box sites at each flat patch location for visualization.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flat_patches</span><span class="p">:</span>
       <span class="k">return</span>
     <span class="n">site_thickness</span> <span class="o">=</span> <span class="mf">0.02</span>
@@ -554,120 +654,9 @@ document.write(`
               <span class="n">group</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
             <span class="p">)</span>
 
-  <span class="nd">@property</span>
-  <span class="k">def</span><span class="w"> </span><span class="nf">spec</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">mujoco</span><span class="o">.</span><span class="n">MjSpec</span><span class="p">:</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spec</span>
-
-  <span class="nd">@property</span>
-  <span class="k">def</span><span class="w"> </span><span class="nf">flat_patches</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flat_patches</span>
-
-<div class="viewcode-block" id="TerrainImporter.import_ground_plane">
-<a class="viewcode-back" href="../../../source/api/terrains.html#mjlab.terrains.TerrainImporter.import_ground_plane">[docs]</a>
-  <span class="k">def</span><span class="w"> </span><span class="nf">import_ground_plane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">_DEFAULT_PLANE_TEXTURE</span><span class="o">.</span><span class="n">edit_spec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="p">)</span>
-    <span class="n">_DEFAULT_PLANE_MATERIAL</span><span class="o">.</span><span class="n">edit_spec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="o">.</span><span class="n">worldbody</span><span class="o">.</span><span class="n">add_body</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">add_geom</span><span class="p">(</span>
-      <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-      <span class="nb">type</span><span class="o">=</span><span class="n">mujoco</span><span class="o">.</span><span class="n">mjtGeom</span><span class="o">.</span><span class="n">mjGEOM_PLANE</span><span class="p">,</span>
-      <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">),</span>
-      <span class="n">material</span><span class="o">=</span><span class="n">_DEFAULT_PLANE_MATERIAL</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">spec_cfg</span><span class="o">.</span><span class="n">LightCfg</span><span class="p">(</span><span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;directional&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">edit_spec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="TerrainImporter.configure_env_origins">
-<a class="viewcode-back" href="../../../source/api/terrains.html#mjlab.terrains.TerrainImporter.configure_env_origins">[docs]</a>
-  <span class="k">def</span><span class="w"> </span><span class="nf">configure_env_origins</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">origins</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configure the origins of the environments based on the added terrain.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">origins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-      <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">origins</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-        <span class="n">origins</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">origins</span><span class="p">)</span>
-      <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">origins</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span> <span class="o">=</span> <span class="n">origins</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_env_origins_curriculum</span><span class="p">(</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">num_envs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span>
-      <span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span> <span class="o">=</span> <span class="kc">None</span>
-      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">env_spacing</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-          <span class="s2">&quot;Environment spacing must be specified for configuring grid-like origins.&quot;</span>
-        <span class="p">)</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_env_origins_grid</span><span class="p">(</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">num_envs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">env_spacing</span>
-      <span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="TerrainImporter.update_env_origins">
-<a class="viewcode-back" href="../../../source/api/terrains.html#mjlab.terrains.TerrainImporter.update_env_origins">[docs]</a>
-  <span class="k">def</span><span class="w"> </span><span class="nf">update_env_origins</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">move_up</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">move_down</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
-  <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Update the environment origins based on the terrain levels.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-      <span class="k">return</span>
-    <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">move_up</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">move_down</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_terrain_level</span><span class="p">,</span>
-      <span class="n">torch</span><span class="o">.</span><span class="n">randint_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">[</span><span class="n">env_ids</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_terrain_level</span><span class="p">),</span>
-      <span class="n">torch</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">[</span><span class="n">env_ids</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span>
-    <span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span><span class="p">[</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">[</span><span class="n">env_ids</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_types</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span>
-    <span class="p">]</span></div>
-
-
-<div class="viewcode-block" id="TerrainImporter.randomize_env_origins">
-<a class="viewcode-back" href="../../../source/api/terrains.html#mjlab.terrains.TerrainImporter.randomize_env_origins">[docs]</a>
-  <span class="k">def</span><span class="w"> </span><span class="nf">randomize_env_origins</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Randomize the environment origins to random sub-terrains.</span>
-
-<span class="sd">    This randomizes both the terrain level (row) and terrain type (column),</span>
-<span class="sd">    useful for play/evaluation mode where you want to test on varied terrains.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-      <span class="k">return</span>
-    <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-    <span class="n">num_rows</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
-    <span class="n">num_envs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">env_ids</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span>
-      <span class="mi">0</span><span class="p">,</span> <span class="n">num_rows</span><span class="p">,</span> <span class="p">(</span><span class="n">num_envs</span><span class="p">,),</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
-    <span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">terrain_types</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span>
-      <span class="mi">0</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">,</span> <span class="p">(</span><span class="n">num_envs</span><span class="p">,),</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
-    <span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">env_origins</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_origins</span><span class="p">[</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">[</span><span class="n">env_ids</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_types</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span>
-    <span class="p">]</span></div>
-
-
   <span class="k">def</span><span class="w"> </span><span class="nf">_compute_env_origins_curriculum</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">num_envs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">origins</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
   <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the origins of the environments defined by the sub-terrains origins.</span>
-
-<span class="sd">    Allocation strategy:</span>
-<span class="sd">      - Columns (terrain_types): Evenly distributed across environments using</span>
-<span class="sd">        integer division. Each column gets floor(num_envs / num_cols) or</span>
-<span class="sd">        ceil(num_envs / num_cols) envs.</span>
-<span class="sd">      - Rows (terrain_levels): Randomly sampled from [0, max_init_terrain_level].</span>
-<span class="sd">        Supports curriculum learning where rows represent difficulty levels.</span>
-
-<span class="sd">    .. note::</span>
-<span class="sd">      Multiple environments can be assigned to the same (row, col) patch, leaving</span>
-<span class="sd">      other patches unoccupied, even when num_envs &gt; num_patches. This is because</span>
-<span class="sd">      row assignment is random while column assignment is deterministic.</span>
-
-<span class="sd">    Example: 5x5 terrain grid (25 patches), 100 environments:</span>
-<span class="sd">      - Each of 5 columns gets exactly 20 environments</span>
-<span class="sd">      - Those 20 are randomly distributed across 5 rows</span>
-<span class="sd">      - Result: Some patches get 0 envs, others might get 5+</span>
-
-<span class="sd">    See FAQ: &quot;How does env_origins determine robot layout?&quot;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">num_rows</span><span class="p">,</span> <span class="n">num_cols</span> <span class="o">=</span> <span class="n">origins</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">max_init_terrain_level</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
       <span class="n">max_init_level</span> <span class="o">=</span> <span class="n">num_rows</span> <span class="o">-</span> <span class="mi">1</span>
@@ -675,39 +664,26 @@ document.write(`
       <span class="n">max_init_level</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">max_init_terrain_level</span><span class="p">,</span> <span class="n">num_rows</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">max_terrain_level</span> <span class="o">=</span> <span class="n">num_rows</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span>
-      <span class="mi">0</span><span class="p">,</span> <span class="n">max_init_level</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">num_envs</span><span class="p">,),</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+      <span class="mi">0</span><span class="p">,</span> <span class="n">max_init_level</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">num_envs</span><span class="p">,),</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_device</span>
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">terrain_types</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">div</span><span class="p">(</span>
-      <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_envs</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+      <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_envs</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="p">),</span>
       <span class="p">(</span><span class="n">num_envs</span> <span class="o">/</span> <span class="n">num_cols</span><span class="p">),</span>
       <span class="n">rounding_mode</span><span class="o">=</span><span class="s2">&quot;floor&quot;</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
-    <span class="n">env_origins</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_envs</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">env_origins</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_envs</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="p">)</span>
     <span class="n">env_origins</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">origins</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">terrain_levels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">terrain_types</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">env_origins</span>
 
   <span class="k">def</span><span class="w"> </span><span class="nf">_compute_env_origins_grid</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">num_envs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">env_spacing</span><span class="p">:</span> <span class="nb">float</span>
   <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute the origins of the environments in a grid based on configured spacing.</span>
-
-<span class="sd">    Creates an approximately square grid centered at the world origin where:</span>
-<span class="sd">      - num_rows ≈ ceil(sqrt(num_envs))</span>
-<span class="sd">      - num_cols = ceil(num_envs / num_rows)</span>
-
-<span class="sd">    Examples:</span>
-<span class="sd">      - 32 envs → 7 rows x 5 cols</span>
-<span class="sd">      - 64 envs → 8 rows x 8 cols</span>
-<span class="sd">      - 4096 envs → 64 rows x 64 cols</span>
-
-<span class="sd">    See FAQ: &quot;How does env_origins determine robot layout?&quot;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">env_origins</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_envs</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">env_origins</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_envs</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="p">)</span>
     <span class="n">num_rows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">num_envs</span> <span class="o">/</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">num_envs</span><span class="p">)))</span>
     <span class="n">num_cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">num_envs</span> <span class="o">/</span> <span class="n">num_rows</span><span class="p">)</span>
     <span class="n">ii</span><span class="p">,</span> <span class="n">jj</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span>
-      <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_rows</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
-      <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_cols</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span>
+      <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_rows</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="p">),</span>
+      <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">num_cols</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_device</span><span class="p">),</span>
       <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">env_origins</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">ii</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[:</span><span class="n">num_envs</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">num_rows</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">env_spacing</span>
