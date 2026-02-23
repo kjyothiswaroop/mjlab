@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Distributed Training &#8212; mjlab Documentation</title>
+    <title>Contributing &#8212; mjlab Documentation</title>
   
   
   
@@ -51,11 +51,12 @@
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'source/distributed_training';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'source/contributing';</script>
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="RayCast Sensor" href="raycast_sensor.html" />
+    <link rel="next" title="Changelog" href="changelog.html" />
+    <link rel="prev" title="FAQ &amp; Troubleshooting" href="faq.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
     <meta name="docbuild:last-update" content="Feb 23, 2026"/>
@@ -168,10 +169,10 @@
 <div class="sidebar-version-switcher">
   <label class="sidebar-version-label" for="version-select">Version</label>
   <select id="version-select" class="sidebar-version-select" onchange="location = this.value;">
-    <option value="distributed_training.html" selected>main</option>
-    <option value="../../v1.1.1/source/distributed_training.html" >v1.1.1</option>
-    <option value="../../v1.1.0/source/distributed_training.html" >v1.1.0</option>
-    <option value="../../v1.0.0/source/distributed_training.html" >v1.0.0</option>
+    <option value="contributing.html" selected>main</option>
+    <option value="../../v1.1.1/index.html" >v1.1.1</option>
+    <option value="../../v1.1.0/index.html" >v1.1.0</option>
+    <option value="../../v1.0.0/index.html" >v1.0.0</option>
   </select>
 </div>
 </div>
@@ -183,10 +184,10 @@
 <li class="toctree-l1"><a class="reference internal" href="migration_isaac_lab.html">Migrating from Isaac Lab</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">About the Project</span></p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="motivation.html">Why mjlab?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ &amp; Troubleshooting</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -204,14 +205,14 @@
 </details></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
-<ul class="current nav bd-sidenav">
+<ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="randomization.html">Domain Randomization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nan_guard.html">NaN Guard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="observation.html">Observation History and Delay</a></li>
 <li class="toctree-l1"><a class="reference internal" href="actuators.html">Actuators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sensors.html">Sensors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="raycast_sensor.html">RayCast Sensor</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Distributed Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="distributed_training.html">Distributed Training</a></li>
 </ul>
 
     </div>
@@ -283,7 +284,7 @@
       
       
       
-      <li><a href="https://github.com/mujocolab/mjlab/edit/main/docs/source/distributed_training.rst" target="_blank"
+      <li><a href="https://github.com/mujocolab/mjlab/edit/main/docs/source/contributing.rst" target="_blank"
    class="btn btn-sm btn-source-edit-button dropdown-item"
    title="Suggest edit"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -300,7 +301,7 @@
       
       
       
-      <li><a href="https://github.com/mujocolab/mjlab/issues/new?title=Issue%20on%20page%20%2Fsource/distributed_training.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/mujocolab/mjlab/issues/new?title=Issue%20on%20page%20%2Fsource/contributing.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -330,7 +331,7 @@
       
       
       
-      <li><a href="../_sources/source/distributed_training.rst" target="_blank"
+      <li><a href="../_sources/source/contributing.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -414,7 +415,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Distributed Training</h1>
+    <h1>Contributing</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -424,9 +425,8 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tl-dr">TL;DR</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration">Configuration</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-works">How It Works</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#claude-md">CLAUDE.md</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#claude-code-commands">Claude Code Commands</a></li>
 </ul>
             </nav>
         </div>
@@ -438,98 +438,32 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="distributed-training">
-<span id="id1"></span><h1>Distributed Training<a class="headerlink" href="#distributed-training" title="Link to this heading">#</a></h1>
-<p>mjlab supports multi-GPU distributed training using
-<a class="reference external" href="https://github.com/apoorvkh/torchrunx">torchrunx</a>. Distributed training
-parallelizes RL workloads across multiple GPUs by running independent rollouts
-on each device and synchronizing gradients during policy updates. Throughput
-scales nearly linearly with GPU count.</p>
-<section id="tl-dr">
-<h2>TL;DR<a class="headerlink" href="#tl-dr" title="Link to this heading">#</a></h2>
-<p><strong>Single GPU (default):</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>train<span class="w"> </span>&lt;task-name&gt;<span class="w"> </span>&lt;task-specific<span class="w"> </span>CLI<span class="w"> </span>args&gt;
-<span class="c1"># or explicitly: --gpu-ids 0</span>
-</pre></div>
-</div>
-<p><strong>Multi-GPU:</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>train<span class="w"> </span>&lt;task-name&gt;<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--gpu-ids<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>&lt;task-specific<span class="w"> </span>CLI<span class="w"> </span>args&gt;
-</pre></div>
-</div>
-<p><strong>All GPUs:</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>train<span class="w"> </span>&lt;task-name&gt;<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--gpu-ids<span class="w"> </span>all<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>&lt;task-specific<span class="w"> </span>CLI<span class="w"> </span>args&gt;
-</pre></div>
-</div>
-<p><strong>CPU mode:</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>run<span class="w"> </span>train<span class="w"> </span>&lt;task-name&gt;<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--gpu-ids<span class="w"> </span>None<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>&lt;task-specific<span class="w"> </span>CLI<span class="w"> </span>args&gt;
-<span class="c1"># or: CUDA_VISIBLE_DEVICES=&quot;&quot; uv run train &lt;task-name&gt; ...</span>
-</pre></div>
-</div>
-<p><strong>Key points:</strong></p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">--gpu-ids</span></code> specifies GPU indices (e.g., <code class="docutils literal notranslate"><span class="pre">--gpu-ids</span> <span class="pre">0</span> <span class="pre">1</span></code> for 2 GPUs)</p></li>
-<li><p>GPU indices are relative to <code class="docutils literal notranslate"><span class="pre">CUDA_VISIBLE_DEVICES</span></code> if set</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">CUDA_VISIBLE_DEVICES=2,3</span> <span class="pre">uv</span> <span class="pre">run</span> <span class="pre">train</span> <span class="pre">...</span> <span class="pre">--gpu-ids</span> <span class="pre">0</span> <span class="pre">1</span></code> uses physical GPUs 2 and 3</p></li>
-<li><p>Each GPU runs the full <code class="docutils literal notranslate"><span class="pre">num-envs</span></code> count (e.g., 2 GPUs × 4096 envs = 8192 total)</p></li>
-<li><p>Single-GPU and CPU modes run directly; multi-GPU uses <code class="docutils literal notranslate"><span class="pre">torchrunx</span></code> for process
-spawning</p></li>
-</ul>
+  <section id="contributing">
+<h1>Contributing<a class="headerlink" href="#contributing" title="Link to this heading">#</a></h1>
+<p>See <a class="reference external" href="https://github.com/mujocolab/mjlab/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>
+for the general contribution workflow, including forking, testing, and changelog
+conventions.</p>
+<section id="claude-md">
+<h2>CLAUDE.md<a class="headerlink" href="#claude-md" title="Link to this heading">#</a></h2>
+<p>The repository includes a <code class="docutils literal notranslate"><span class="pre">CLAUDE.md</span></code> file at the project root. This file
+defines development conventions, style guidelines, and common commands for
+<a class="reference external" href="https://claude.com/claude-code">Claude Code</a>. It is also a useful reference
+for human contributors since it captures the same rules enforced in CI.</p>
 </section>
-<section id="configuration">
-<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading">#</a></h2>
-<p><strong>torchrunx Logging:</strong></p>
-<p>By default, torchrunx process logs are saved to <code class="docutils literal notranslate"><span class="pre">{log_dir}/torchrunx/</span></code>. You can
-customize this:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Disable torchrunx file logging.</span>
-uv<span class="w"> </span>run<span class="w"> </span>train<span class="w"> </span>&lt;task-name&gt;<span class="w"> </span>--gpu-ids<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">1</span><span class="w"> </span>--torchrunx-log-dir<span class="w"> </span><span class="s2">&quot;&quot;</span>
-
-<span class="c1"># Custom log directory.</span>
-uv<span class="w"> </span>run<span class="w"> </span>train<span class="w"> </span>&lt;task-name&gt;<span class="w"> </span>--gpu-ids<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">1</span><span class="w"> </span>--torchrunx-log-dir<span class="w"> </span>/path/to/logs
-
-<span class="c1"># Or use environment variable (takes precedence over flag).</span>
-<span class="nv">TORCHRUNX_LOG_DIR</span><span class="o">=</span>/tmp/logs<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>train<span class="w"> </span>&lt;task-name&gt;<span class="w"> </span>--gpu-ids<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">1</span>
+<section id="claude-code-commands">
+<h2>Claude Code Commands<a class="headerlink" href="#claude-code-commands" title="Link to this heading">#</a></h2>
+<p>The project includes shared Claude Code commands in <code class="docutils literal notranslate"><span class="pre">.claude/commands/</span></code>.
+Any contributor with Claude Code installed can invoke them as slash commands.</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">/update-mjwarp</span> <span class="pre">&lt;commit-hash&gt;</span></code></dt><dd><p>Update the <code class="docutils literal notranslate"><span class="pre">mujoco-warp</span></code> dependency to a specific commit. This edits
+<code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>, runs <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">lock</span></code>, and opens a PR in one step.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>/update-mjwarp e28c6038cdf8a353b4146974e4cf37e74dda809a
 </pre></div>
 </div>
-<p>The priority is <code class="docutils literal notranslate"><span class="pre">TORCHRUNX_LOG_DIR</span></code> env var, <code class="docutils literal notranslate"><span class="pre">--torchrunx-log-dir</span></code> flag, default
-<code class="docutils literal notranslate"><span class="pre">{log_dir}/torchrunx</span></code>.</p>
-<p><strong>Single-Writer Operations:</strong></p>
-<p>Only rank 0 performs file I/O operations (config files, videos, wandb logging)
-to avoid race conditions. All workers participate in training, but logging
-artifacts are written once by the main process.</p>
-</section>
-<section id="how-it-works">
-<h2>How It Works<a class="headerlink" href="#how-it-works" title="Link to this heading">#</a></h2>
-<p>mjlab’s role is simple: <strong>isolate mjwarp simulations on each GPU</strong> using
-<code class="docutils literal notranslate"><span class="pre">wp.ScopedDevice</span></code>. This ensures each process’s environments stay on their
-assigned device. <code class="docutils literal notranslate"><span class="pre">torchrunx</span></code> handles the rest.</p>
-<p><strong>Process spawning.</strong> Multi-GPU training uses <code class="docutils literal notranslate"><span class="pre">torchrunx.Launcher(...).run(...)</span></code>
-to spawn N independent processes (one per GPU) and sets environment variables
-(<code class="docutils literal notranslate"><span class="pre">RANK</span></code>, <code class="docutils literal notranslate"><span class="pre">LOCAL_RANK</span></code>, <code class="docutils literal notranslate"><span class="pre">WORLD_SIZE</span></code>) to coordinate them. Each process executes
-the training function with its assigned GPU.</p>
-<p><strong>Independent rollouts.</strong> Each process maintains its own:</p>
-<ul class="simple">
-<li><p>Environment instances (with <code class="docutils literal notranslate"><span class="pre">num-envs</span></code> parallel environments), isolated on
-its assigned GPU via <code class="docutils literal notranslate"><span class="pre">wp.ScopedDevice</span></code></p></li>
-<li><p>Policy network copy</p></li>
-<li><p>Experience buffer (sized <code class="docutils literal notranslate"><span class="pre">num_steps_per_env</span> <span class="pre">×</span> <span class="pre">num-envs</span></code>)</p></li>
-</ul>
-<p>Each process uses <code class="docutils literal notranslate"><span class="pre">seed</span> <span class="pre">=</span> <span class="pre">cfg.seed</span> <span class="pre">+</span> <span class="pre">local_rank</span></code> to ensure different random
-experiences across GPUs, increasing sample diversity.</p>
-<p><strong>Gradient synchronization.</strong> During the update phase, <code class="docutils literal notranslate"><span class="pre">rsl_rl</span></code> synchronizes
-gradients after each mini-batch through its <code class="docutils literal notranslate"><span class="pre">reduce_parameters()</span></code> method:</p>
-<ol class="arabic simple">
-<li><p>Each process computes gradients independently on its local mini-batch</p></li>
-<li><p>All policy gradients are flattened into a single tensor</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">torch.distributed.all_reduce</span></code> averages gradients across all GPUs</p></li>
-<li><p>Averaged gradients are copied back to each parameter, keeping policies
-synchronized</p></li>
-</ol>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">/commit-push-pr</span></code></dt><dd><p>Stage current changes, commit, push, and open a PR.</p>
+</dd>
+</dl>
 </section>
 </section>
 
@@ -545,13 +479,22 @@ synchronized</p></li>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="raycast_sensor.html"
+       href="faq.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">RayCast Sensor</p>
+        <p class="prev-next-title">FAQ &amp; Troubleshooting</p>
       </div>
+    </a>
+    <a class="right-next"
+       href="changelog.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Changelog</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
     </a>
 </div>
                 </footer>
@@ -569,9 +512,8 @@ synchronized</p></li>
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tl-dr">TL;DR</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration">Configuration</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-it-works">How It Works</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#claude-md">CLAUDE.md</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#claude-code-commands">Claude Code Commands</a></li>
 </ul>
   </nav></div>
 
