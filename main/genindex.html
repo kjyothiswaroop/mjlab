@@ -186,6 +186,7 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="source/motivation.html">Why mjlab?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source/faq.html">FAQ &amp; Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source/changelog.html">Changelog</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -1365,6 +1366,8 @@ document.write(`
 </li>
       <li><a href="source/api/entity.html#mjlab.entity.Entity.find_lights">find_lights() (mjlab.entity.Entity method)</a>
 </li>
+      <li><a href="source/api/entity.html#mjlab.entity.Entity.find_materials">find_materials() (mjlab.entity.Entity method)</a>
+</li>
       <li><a href="source/api/entity.html#mjlab.entity.Entity.find_sites">find_sites() (mjlab.entity.Entity method)</a>
 </li>
       <li><a href="source/api/entity.html#mjlab.entity.Entity.find_tendons">find_tendons() (mjlab.entity.Entity method)</a>
@@ -1413,10 +1416,10 @@ document.write(`
         <li><a href="source/api/sensor.html#mjlab.sensor.PinholeCameraPatternCfg.fovy">(mjlab.sensor.PinholeCameraPatternCfg attribute)</a>
 </li>
       </ul></li>
-      <li><a href="source/api/actuator.html#mjlab.actuator.BuiltinMuscleActuatorCfg.fpmax">fpmax (mjlab.actuator.BuiltinMuscleActuatorCfg attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="source/api/actuator.html#mjlab.actuator.BuiltinMuscleActuatorCfg.fpmax">fpmax (mjlab.actuator.BuiltinMuscleActuatorCfg attribute)</a>
+</li>
       <li><a href="source/api/sensor.html#mjlab.sensor.RayCastSensorCfg.frame">frame (mjlab.sensor.RayCastSensorCfg attribute)</a>
 </li>
       <li><a href="source/api/entity.html#mjlab.entity.EntityIndexing.free_joint_q_adr">free_joint_q_adr (mjlab.entity.EntityIndexing attribute)</a>
@@ -1917,9 +1920,21 @@ document.write(`
 </li>
       <li><a href="source/api/managers.html#mjlab.managers.ManagerTermBaseCfg">ManagerTermBaseCfg (class in mjlab.managers)</a>
 </li>
+      <li><a href="source/api/entity.html#mjlab.entity.EntityIndexing.mat_ids">mat_ids (mjlab.entity.EntityIndexing attribute)</a>
+</li>
+      <li><a href="source/api/managers.html#mjlab.managers.SceneEntityCfg.material_ids">material_ids (mjlab.managers.SceneEntityCfg attribute)</a>
+</li>
+      <li><a href="source/api/entity.html#mjlab.entity.Entity.material_names">material_names (mjlab.entity.Entity property)</a>
+
+      <ul>
+        <li><a href="source/api/managers.html#mjlab.managers.SceneEntityCfg.material_names">(mjlab.managers.SceneEntityCfg attribute)</a>
+</li>
+      </ul></li>
       <li><a href="source/api/entity.html#mjlab.entity.EntityCfg.materials">materials (mjlab.entity.EntityCfg attribute)</a>
 
       <ul>
+        <li><a href="source/api/entity.html#mjlab.entity.EntityIndexing.materials">(mjlab.entity.EntityIndexing attribute)</a>
+</li>
         <li><a href="source/api/terrains.html#mjlab.terrains.TerrainEntityCfg.materials">(mjlab.terrains.TerrainEntityCfg attribute)</a>
 </li>
       </ul></li>
@@ -1967,6 +1982,8 @@ document.write(`
         <li><a href="source/api/entity.html#module-mjlab.entity">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     mjlab.envs
 
@@ -1974,8 +1991,6 @@ document.write(`
         <li><a href="source/api/envs.html#module-mjlab.envs">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     mjlab.managers
 
@@ -2141,6 +2156,8 @@ document.write(`
       <li><a href="source/api/entity.html#mjlab.entity.Entity.num_joints">num_joints (mjlab.entity.Entity property)</a>
 </li>
       <li><a href="source/api/entity.html#mjlab.entity.Entity.num_lights">num_lights (mjlab.entity.Entity property)</a>
+</li>
+      <li><a href="source/api/entity.html#mjlab.entity.Entity.num_materials">num_materials (mjlab.entity.Entity property)</a>
 </li>
       <li><a href="source/api/terrains.html#mjlab.terrains.HfDiscreteObstaclesTerrainCfg.num_obstacles">num_obstacles (mjlab.terrains.HfDiscreteObstaclesTerrainCfg attribute)</a>
 </li>

@@ -186,6 +186,7 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../source/motivation.html">Why mjlab?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/faq.html">FAQ &amp; Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/changelog.html">Changelog</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -641,7 +642,7 @@ document.write(`
     <span class="bp">self</span><span class="o">.</span><span class="n">_model_bridge</span><span class="o">.</span><span class="n">clear_cache</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sensor_context</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_sensor_context</span><span class="o">.</span><span class="n">recreate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mj_model</span><span class="p">)</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_sensor_context</span><span class="o">.</span><span class="n">recreate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mj_model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expanded_fields</span><span class="p">)</span>
 
     <span class="c1"># Field expansion allocates new arrays and replaces them via setattr. The</span>
     <span class="c1"># CUDA graph captured the old memory addresses, so we must recreate it.</span>

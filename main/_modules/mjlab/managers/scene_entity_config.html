@@ -186,6 +186,7 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../source/motivation.html">Why mjlab?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/faq.html">FAQ &amp; Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/changelog.html">Changelog</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -403,6 +404,13 @@ document.write(`
     <span class="s2">&quot;num_lights&quot;</span><span class="p">,</span>
     <span class="s2">&quot;light&quot;</span><span class="p">,</span>
   <span class="p">),</span>
+  <span class="n">_FieldConfig</span><span class="p">(</span>
+    <span class="s2">&quot;material_names&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;material_ids&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;find_materials&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;num_materials&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;material&quot;</span><span class="p">,</span>
+  <span class="p">),</span>
 <span class="p">]</span>
 
 
@@ -467,6 +475,12 @@ document.write(`
 
   <span class="n">light_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">slice</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;IDs of lights to include. Can be a list or slice.&quot;&quot;&quot;</span>
+
+  <span class="n">material_names</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Names of materials to include. Can be a single string or tuple.&quot;&quot;&quot;</span>
+
+  <span class="n">material_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">slice</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;IDs of materials to include. Can be a list or slice.&quot;&quot;&quot;</span>
 
   <span class="n">preserve_order</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;If True, maintains the order of components as specified.&quot;&quot;&quot;</span>

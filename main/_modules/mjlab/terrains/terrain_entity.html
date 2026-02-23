@@ -186,6 +186,7 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../source/motivation.html">Why mjlab?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/faq.html">FAQ &amp; Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/changelog.html">Changelog</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -363,7 +364,7 @@ document.write(`
   <h1>Source code for mjlab.terrains.terrain_entity</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">mujoco</span>
@@ -373,6 +374,8 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.entity</span><span class="w"> </span><span class="kn">import</span> <span class="n">Entity</span><span class="p">,</span> <span class="n">EntityCfg</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.terrains.terrain_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">TerrainGenerator</span><span class="p">,</span> <span class="n">TerrainGeneratorCfg</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">spec_config</span> <span class="k">as</span> <span class="n">spec_cfg</span>
+
+<span class="n">_DEFAULT_SUN_LIGHT</span> <span class="o">=</span> <span class="n">spec_cfg</span><span class="o">.</span><span class="n">LightCfg</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;sun&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;directional&quot;</span><span class="p">)</span>
 
 <span class="n">_DEFAULT_PLANE_TEXTURE</span> <span class="o">=</span> <span class="n">spec_cfg</span><span class="o">.</span><span class="n">TextureCfg</span><span class="p">(</span>
   <span class="n">name</span><span class="o">=</span><span class="s2">&quot;groundplane&quot;</span><span class="p">,</span>
@@ -392,6 +395,7 @@ document.write(`
   <span class="n">texrepeat</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
   <span class="n">reflectance</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
   <span class="n">texture</span><span class="o">=</span><span class="s2">&quot;groundplane&quot;</span><span class="p">,</span>
+  <span class="n">geom_names_expr</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;terrain&quot;</span><span class="p">,),</span>
 <span class="p">)</span>
 
 
@@ -416,6 +420,20 @@ document.write(`
   <span class="n">num_envs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="w">  </span><span class="sd">&quot;&quot;&quot;Number of parallel environments to create. This will get overridden by the</span>
 <span class="sd">  scene configuration if specified there.&quot;&quot;&quot;</span>
+  <span class="n">textures</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">spec_cfg</span><span class="o">.</span><span class="n">TextureCfg</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+    <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">(</span><span class="n">_DEFAULT_PLANE_TEXTURE</span><span class="p">,)</span>
+  <span class="p">)</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Textures for the ground plane. Defaults to a checker pattern. Set to</span>
+<span class="sd">  ``()`` to disable textures (e.g. when using ``dr.geom_rgba``).&quot;&quot;&quot;</span>
+  <span class="n">materials</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">spec_cfg</span><span class="o">.</span><span class="n">MaterialCfg</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+    <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">(</span><span class="n">_DEFAULT_PLANE_MATERIAL</span><span class="p">,)</span>
+  <span class="p">)</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Materials for the ground plane. Defaults to the checker material. Set to</span>
+<span class="sd">  ``()`` to disable materials (e.g. when using ``dr.geom_rgba``).&quot;&quot;&quot;</span>
+  <span class="n">lights</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">spec_cfg</span><span class="o">.</span><span class="n">LightCfg</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+    <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">(</span><span class="n">_DEFAULT_SUN_LIGHT</span><span class="p">,)</span>
+  <span class="p">)</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Lights for the scene. Defaults to a directional sun light.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="TerrainEntityCfg.build">
 <a class="viewcode-back" href="../../../source/api/terrains.html#mjlab.terrains.TerrainEntityCfg.build">[docs]</a>
@@ -579,16 +597,10 @@ document.write(`
   <span class="c1"># Private methods.</span>
 
   <span class="k">def</span><span class="w"> </span><span class="nf">_import_ground_plane</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="n">_DEFAULT_PLANE_TEXTURE</span><span class="o">.</span><span class="n">edit_spec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="p">)</span>
-    <span class="n">_DEFAULT_PLANE_MATERIAL</span><span class="o">.</span><span class="n">edit_spec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="o">.</span><span class="n">worldbody</span><span class="o">.</span><span class="n">add_body</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">add_geom</span><span class="p">(</span>
       <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
       <span class="nb">type</span><span class="o">=</span><span class="n">mujoco</span><span class="o">.</span><span class="n">mjtGeom</span><span class="o">.</span><span class="n">mjGEOM_PLANE</span><span class="p">,</span>
       <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">),</span>
-      <span class="n">material</span><span class="o">=</span><span class="n">_DEFAULT_PLANE_MATERIAL</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">spec_cfg</span><span class="o">.</span><span class="n">LightCfg</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;sun&quot;</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;directional&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">edit_spec</span><span class="p">(</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_spec</span>
     <span class="p">)</span>
 
   <span class="k">def</span><span class="w"> </span><span class="nf">_add_env_origin_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>

@@ -187,6 +187,7 @@
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../motivation.html">Why mjlab?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ &amp; Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -620,14 +621,14 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.env_spacing"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.env_spacing</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.max_init_terrain_level"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.max_init_terrain_level</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.num_envs"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.num_envs</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.textures"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.textures</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.materials"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.materials</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.lights"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.lights</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.build"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.build()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.__init__"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.__init__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.init_state"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.init_state</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.spec_fn"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.spec_fn</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.lights"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.lights</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.cameras"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.cameras</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.textures"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.textures</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.materials"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.materials</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.collisions"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.collisions</span></code></a></li>
 </ul>
 </li>
@@ -2369,6 +2370,15 @@ randomly sampled. This means multiple environments can spawn on the same
 <tr class="row-odd"><td><p><a class="reference internal" href="#mjlab.terrains.TerrainEntityCfg.num_envs" title="mjlab.terrains.TerrainEntityCfg.num_envs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_envs</span></code></a></p></td>
 <td><p>Number of parallel environments to create.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mjlab.terrains.TerrainEntityCfg.textures" title="mjlab.terrains.TerrainEntityCfg.textures"><code class="xref py py-obj docutils literal notranslate"><span class="pre">textures</span></code></a></p></td>
+<td><p>Textures for the ground plane.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mjlab.terrains.TerrainEntityCfg.materials" title="mjlab.terrains.TerrainEntityCfg.materials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">materials</span></code></a></p></td>
+<td><p>Materials for the ground plane.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mjlab.terrains.TerrainEntityCfg.lights" title="mjlab.terrains.TerrainEntityCfg.lights"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lights</span></code></a></p></td>
+<td><p>Lights for the scene.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -2419,6 +2429,26 @@ curriculum mode. None uses all available rows.</p>
 scene configuration if specified there.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mjlab.terrains.TerrainEntityCfg.textures">
+<span class="sig-name descname"><span class="pre">textures</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">spec_cfg.TextureCfg</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mjlab.terrains.TerrainEntityCfg.textures" title="Link to this definition">#</a></dt>
+<dd><p>Textures for the ground plane. Defaults to a checker pattern. Set to
+<code class="docutils literal notranslate"><span class="pre">()</span></code> to disable textures (e.g. when using <code class="docutils literal notranslate"><span class="pre">dr.geom_rgba</span></code>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mjlab.terrains.TerrainEntityCfg.materials">
+<span class="sig-name descname"><span class="pre">materials</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">spec_cfg.MaterialCfg</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mjlab.terrains.TerrainEntityCfg.materials" title="Link to this definition">#</a></dt>
+<dd><p>Materials for the ground plane. Defaults to the checker material. Set to
+<code class="docutils literal notranslate"><span class="pre">()</span></code> to disable materials (e.g. when using <code class="docutils literal notranslate"><span class="pre">dr.geom_rgba</span></code>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mjlab.terrains.TerrainEntityCfg.lights">
+<span class="sig-name descname"><span class="pre">lights</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">spec_cfg.LightCfg</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mjlab.terrains.TerrainEntityCfg.lights" title="Link to this definition">#</a></dt>
+<dd><p>Lights for the scene. Defaults to a directional sun light.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="mjlab.terrains.TerrainEntityCfg.build">
 <span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#mjlab.terrains.TerrainEntity" title="mjlab.terrains.terrain_entity.TerrainEntity"><span class="pre">TerrainEntity</span></a></span></span><a class="reference internal" href="../../_modules/mjlab/terrains/terrain_entity.html#TerrainEntityCfg.build"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mjlab.terrains.TerrainEntityCfg.build" title="Link to this definition">#</a></dt>
@@ -2442,23 +2472,8 @@ scene configuration if specified there.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="mjlab.terrains.TerrainEntityCfg.lights">
-<span class="sig-name descname"><span class="pre">lights</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">spec_cfg.LightCfg</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mjlab.terrains.TerrainEntityCfg.lights" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="mjlab.terrains.TerrainEntityCfg.cameras">
 <span class="sig-name descname"><span class="pre">cameras</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">spec_cfg.CameraCfg</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mjlab.terrains.TerrainEntityCfg.cameras" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="mjlab.terrains.TerrainEntityCfg.textures">
-<span class="sig-name descname"><span class="pre">textures</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">spec_cfg.TextureCfg</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mjlab.terrains.TerrainEntityCfg.textures" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="mjlab.terrains.TerrainEntityCfg.materials">
-<span class="sig-name descname"><span class="pre">materials</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">spec_cfg.MaterialCfg</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#mjlab.terrains.TerrainEntityCfg.materials" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -3062,14 +3077,14 @@ Note: Environments are evenly distributed across columns (not random).</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.env_spacing"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.env_spacing</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.max_init_terrain_level"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.max_init_terrain_level</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.num_envs"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.num_envs</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.textures"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.textures</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.materials"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.materials</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.lights"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.lights</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.build"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.build()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.__init__"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.__init__()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.init_state"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.init_state</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.spec_fn"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.spec_fn</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.lights"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.lights</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.cameras"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.cameras</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.textures"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.textures</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.materials"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.materials</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.terrains.TerrainEntityCfg.collisions"><code class="docutils literal notranslate"><span class="pre">TerrainEntityCfg.collisions</span></code></a></li>
 </ul>
 </li>
