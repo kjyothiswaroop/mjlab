@@ -144,7 +144,7 @@
   
   
   
-    <p class="title logo__title">The mjlab Documentation</p>
+    <p class="title logo__title">mjlab Documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item">
@@ -177,17 +177,47 @@
 </div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
-        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../../source/installation.html">Installation Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../source/migration_isaac_lab.html">Migrating from Isaac Lab</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">About the Project</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../../../source/motivation.html">Why mjlab?</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../source/faq.html">FAQ &amp; Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/tutorials.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../source/changelog.html">Changelog</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Concepts</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../source/architecture_overview.html">Architecture Overview</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../source/entity/index.html">Entity</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../source/entity/entity_data.html">Entity Data</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/actuators.html">Actuators</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../source/sensors/index.html">Sensors</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../source/sensors/raycast_sensor.html">RayCast Sensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../source/sensors/rgbd_camera.html">RGB-D Camera</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/scene.html">Scene</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/terrain.html">Terrain</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">The Manager Layer</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../source/environment_config.html">Environment Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/observations.html">Observations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/actions.html">Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/rewards.html">Rewards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/terminations.html">Terminations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/commands.html">Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/events.html">Events</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/randomization.html">Domain Randomization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/curriculum.html">Curriculum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/metrics.html">Metrics</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Training &amp; Debugging</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../../source/training/rsl_rl.html">Training with RSL-RL</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/viewers.html">Viewers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/training/distributed_training.html">Distributed Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/debugging/nan_guard.html">NaN Guard</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="nav bd-sidenav">
@@ -200,18 +230,18 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../source/api/sensor.html">mjlab.sensor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../source/api/managers.html">mjlab.managers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../source/api/terrains.html">mjlab.terrains</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../source/api/rl.html">mjlab.rl</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../source/api/viewer.html">mjlab.viewer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../source/api/tasks.html">mjlab.tasks</a></li>
 </ul>
 </details></li>
 </ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Core Concepts</span></p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Further Reading</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../../../source/randomization.html">Domain Randomization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../source/nan_guard.html">NaN Guard</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../source/observation.html">Observation History and Delay</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../source/actuators.html">Actuators</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../source/sensors.html">Sensors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../source/raycast_sensor.html">RayCast Sensor</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../source/distributed_training.html">Distributed Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/motivation.html">Why mjlab?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/migration_isaac_lab.html">Migrating from Isaac Lab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/faq.html">FAQ &amp; Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/changelog.html">Changelog</a></li>
 </ul>
 
     </div>
@@ -448,8 +478,6 @@ document.write(`
   <span class="n">ROOT_VEL_DIM</span> <span class="o">=</span> <span class="n">LIN_VEL_DIM</span> <span class="o">+</span> <span class="n">ANG_VEL_DIM</span>  <span class="c1"># 6</span>
   <span class="n">ROOT_STATE_DIM</span> <span class="o">=</span> <span class="n">ROOT_POSE_DIM</span> <span class="o">+</span> <span class="n">ROOT_VEL_DIM</span>  <span class="c1"># 13</span>
 
-<div class="viewcode-block" id="EntityData.write_root_state">
-<a class="viewcode-back" href="../../../source/api/entity.html#mjlab.entity.EntityData.write_root_state">[docs]</a>
   <span class="k">def</span><span class="w"> </span><span class="nf">write_root_state</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">root_state</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="nb">slice</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
   <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -458,11 +486,8 @@ document.write(`
     <span class="k">assert</span> <span class="n">root_state</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROOT_STATE_DIM</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">write_root_pose</span><span class="p">(</span><span class="n">root_state</span><span class="p">[:,</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROOT_POSE_DIM</span><span class="p">],</span> <span class="n">env_ids</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">write_root_velocity</span><span class="p">(</span><span class="n">root_state</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROOT_POSE_DIM</span> <span class="p">:],</span> <span class="n">env_ids</span><span class="p">)</span></div>
+    <span class="bp">self</span><span class="o">.</span><span class="n">write_root_velocity</span><span class="p">(</span><span class="n">root_state</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROOT_POSE_DIM</span> <span class="p">:],</span> <span class="n">env_ids</span><span class="p">)</span>
 
-
-<div class="viewcode-block" id="EntityData.write_root_pose">
-<a class="viewcode-back" href="../../../source/api/entity.html#mjlab.entity.EntityData.write_root_pose">[docs]</a>
   <span class="k">def</span><span class="w"> </span><span class="nf">write_root_pose</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">pose</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="nb">slice</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
   <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -471,11 +496,8 @@ document.write(`
     <span class="k">assert</span> <span class="n">pose</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROOT_POSE_DIM</span>
 
     <span class="n">env_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_env_ids</span><span class="p">(</span><span class="n">env_ids</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexing</span><span class="o">.</span><span class="n">free_joint_q_adr</span><span class="p">]</span> <span class="o">=</span> <span class="n">pose</span></div>
+    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexing</span><span class="o">.</span><span class="n">free_joint_q_adr</span><span class="p">]</span> <span class="o">=</span> <span class="n">pose</span>
 
-
-<div class="viewcode-block" id="EntityData.write_root_velocity">
-<a class="viewcode-back" href="../../../source/api/entity.html#mjlab.entity.EntityData.write_root_velocity">[docs]</a>
   <span class="k">def</span><span class="w"> </span><span class="nf">write_root_velocity</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">velocity</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="nb">slice</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
   <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -487,11 +509,8 @@ document.write(`
     <span class="n">quat_w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexing</span><span class="o">.</span><span class="n">free_joint_q_adr</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">7</span><span class="p">]]</span>
     <span class="n">ang_vel_b</span> <span class="o">=</span> <span class="n">quat_apply_inverse</span><span class="p">(</span><span class="n">quat_w</span><span class="p">,</span> <span class="n">velocity</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:])</span>
     <span class="n">velocity_qvel</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">velocity</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">],</span> <span class="n">ang_vel_b</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">qvel</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexing</span><span class="o">.</span><span class="n">free_joint_v_adr</span><span class="p">]</span> <span class="o">=</span> <span class="n">velocity_qvel</span></div>
+    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">qvel</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexing</span><span class="o">.</span><span class="n">free_joint_v_adr</span><span class="p">]</span> <span class="o">=</span> <span class="n">velocity_qvel</span>
 
-
-<div class="viewcode-block" id="EntityData.write_root_com_velocity">
-<a class="viewcode-back" href="../../../source/api/entity.html#mjlab.entity.EntityData.write_root_com_velocity">[docs]</a>
   <span class="k">def</span><span class="w"> </span><span class="nf">write_root_com_velocity</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">velocity</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="nb">slice</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
   <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -507,11 +526,8 @@ document.write(`
     <span class="n">ang_vel_w</span> <span class="o">=</span> <span class="n">velocity</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:]</span>
     <span class="n">lin_vel_link</span> <span class="o">=</span> <span class="n">lin_vel_com</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">ang_vel_w</span><span class="p">,</span> <span class="n">com_offset_w</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">link_velocity</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">lin_vel_link</span><span class="p">,</span> <span class="n">ang_vel_w</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">write_root_velocity</span><span class="p">(</span><span class="n">link_velocity</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">)</span></div>
+    <span class="bp">self</span><span class="o">.</span><span class="n">write_root_velocity</span><span class="p">(</span><span class="n">link_velocity</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">)</span>
 
-
-<div class="viewcode-block" id="EntityData.write_joint_state">
-<a class="viewcode-back" href="../../../source/api/entity.html#mjlab.entity.EntityData.write_joint_state">[docs]</a>
   <span class="k">def</span><span class="w"> </span><span class="nf">write_joint_state</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">position</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -523,11 +539,8 @@ document.write(`
       <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot write joint state for non-articulated entity.&quot;</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">write_joint_position</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">joint_ids</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">write_joint_velocity</span><span class="p">(</span><span class="n">velocity</span><span class="p">,</span> <span class="n">joint_ids</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">)</span></div>
+    <span class="bp">self</span><span class="o">.</span><span class="n">write_joint_velocity</span><span class="p">(</span><span class="n">velocity</span><span class="p">,</span> <span class="n">joint_ids</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">)</span>
 
-
-<div class="viewcode-block" id="EntityData.write_joint_position">
-<a class="viewcode-back" href="../../../source/api/entity.html#mjlab.entity.EntityData.write_joint_position">[docs]</a>
   <span class="k">def</span><span class="w"> </span><span class="nf">write_joint_position</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">position</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -540,11 +553,8 @@ document.write(`
     <span class="n">env_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_env_ids</span><span class="p">(</span><span class="n">env_ids</span><span class="p">)</span>
     <span class="n">joint_ids</span> <span class="o">=</span> <span class="n">joint_ids</span> <span class="k">if</span> <span class="n">joint_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">q_slice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexing</span><span class="o">.</span><span class="n">joint_q_adr</span><span class="p">[</span><span class="n">joint_ids</span><span class="p">]</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="n">q_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">position</span></div>
+    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="n">q_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">position</span>
 
-
-<div class="viewcode-block" id="EntityData.write_joint_velocity">
-<a class="viewcode-back" href="../../../source/api/entity.html#mjlab.entity.EntityData.write_joint_velocity">[docs]</a>
   <span class="k">def</span><span class="w"> </span><span class="nf">write_joint_velocity</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">velocity</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -557,11 +567,8 @@ document.write(`
     <span class="n">env_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_env_ids</span><span class="p">(</span><span class="n">env_ids</span><span class="p">)</span>
     <span class="n">joint_ids</span> <span class="o">=</span> <span class="n">joint_ids</span> <span class="k">if</span> <span class="n">joint_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">v_slice</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexing</span><span class="o">.</span><span class="n">joint_v_adr</span><span class="p">[</span><span class="n">joint_ids</span><span class="p">]</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">qvel</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="n">v_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">velocity</span></div>
+    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">qvel</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="n">v_slice</span><span class="p">]</span> <span class="o">=</span> <span class="n">velocity</span>
 
-
-<div class="viewcode-block" id="EntityData.write_external_wrench">
-<a class="viewcode-back" href="../../../source/api/entity.html#mjlab.entity.EntityData.write_external_wrench">[docs]</a>
   <span class="k">def</span><span class="w"> </span><span class="nf">write_external_wrench</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">force</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -575,11 +582,8 @@ document.write(`
     <span class="k">if</span> <span class="n">force</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">xfrc_applied</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="n">global_body_ids</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">force</span>
     <span class="k">if</span> <span class="n">torque</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">xfrc_applied</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="n">global_body_ids</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">torque</span></div>
+      <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">xfrc_applied</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="n">global_body_ids</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">torque</span>
 
-
-<div class="viewcode-block" id="EntityData.write_ctrl">
-<a class="viewcode-back" href="../../../source/api/entity.html#mjlab.entity.EntityData.write_ctrl">[docs]</a>
   <span class="k">def</span><span class="w"> </span><span class="nf">write_ctrl</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">ctrl</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
@@ -592,11 +596,8 @@ document.write(`
     <span class="n">env_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_env_ids</span><span class="p">(</span><span class="n">env_ids</span><span class="p">)</span>
     <span class="n">local_ctrl_ids</span> <span class="o">=</span> <span class="n">ctrl_ids</span> <span class="k">if</span> <span class="n">ctrl_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">global_ctrl_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexing</span><span class="o">.</span><span class="n">ctrl_ids</span><span class="p">[</span><span class="n">local_ctrl_ids</span><span class="p">]</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ctrl</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="n">global_ctrl_ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctrl</span></div>
+    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ctrl</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="n">global_ctrl_ids</span><span class="p">]</span> <span class="o">=</span> <span class="n">ctrl</span>
 
-
-<div class="viewcode-block" id="EntityData.write_mocap_pose">
-<a class="viewcode-back" href="../../../source/api/entity.html#mjlab.entity.EntityData.write_mocap_pose">[docs]</a>
   <span class="k">def</span><span class="w"> </span><span class="nf">write_mocap_pose</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">pose</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="nb">slice</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
   <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -606,11 +607,8 @@ document.write(`
 
     <span class="n">env_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_env_ids</span><span class="p">(</span><span class="n">env_ids</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">mocap_pos</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexing</span><span class="o">.</span><span class="n">mocap_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">mocap_quat</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexing</span><span class="o">.</span><span class="n">mocap_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">mocap_quat</span><span class="p">[</span><span class="n">env_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indexing</span><span class="o">.</span><span class="n">mocap_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">pose</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
-
-<div class="viewcode-block" id="EntityData.clear_state">
-<a class="viewcode-back" href="../../../source/api/entity.html#mjlab.entity.EntityData.clear_state">[docs]</a>
   <span class="k">def</span><span class="w"> </span><span class="nf">clear_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="nb">slice</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_actuated</span><span class="p">:</span>
       <span class="n">env_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_env_ids</span><span class="p">(</span><span class="n">env_ids</span><span class="p">)</span>
@@ -620,8 +618,7 @@ document.write(`
       <span class="bp">self</span><span class="o">.</span><span class="n">tendon_len_target</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">tendon_vel_target</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">tendon_effort_target</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">site_effort_target</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span></div>
-
+      <span class="bp">self</span><span class="o">.</span><span class="n">site_effort_target</span><span class="p">[</span><span class="n">env_ids</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
 
   <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_env_ids</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">env_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">|</span> <span class="nb">slice</span> <span class="o">|</span> <span class="kc">None</span>
