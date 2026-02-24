@@ -202,6 +202,7 @@ Build and run:
 
 .. code-block:: bash
 
+   make docker-build
    ./scripts/run_docker.sh uv run demo
 
 
