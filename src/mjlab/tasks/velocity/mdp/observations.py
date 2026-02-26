@@ -43,10 +43,6 @@ def foot_contact_forces(env: ManagerBasedRlEnv, sensor_name: str) -> torch.Tenso
   forces_flat = sensor_data.force.flatten(start_dim=1)  # [B, N*3]
   return torch.sign(forces_flat) * torch.log1p(torch.abs(forces_flat))
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 def process_depth_image(
   env: ManagerBasedRlEnv,
   sensor_name: str,
@@ -55,27 +51,11 @@ def process_depth_image(
 ) -> torch.Tensor:
   """Process depth camera image for policy observation.
 
-<<<<<<< Updated upstream
-  Clips depth values between near and far clip distances,
-  normalizes by subtracting near_clip, and flattens to 1D.
-
-  Args:
-    env: The environment.
-    sensor_name: Name of a CameraSensor in the scene.
-    near_clip: Minimum depth distance in meters.
-    far_clip: Maximum depth distance in meters.
-
-  Returns:
-    Tensor of shape [B, H*W] with normalized depth values.
-  """
-  from mjlab.sensor import CameraSensor
-=======
   Clamps depth values to [near_clip, far_clip], replaces NaN/Inf with
   far_clip, subtracts near_clip, and flattens to [num_envs, H*W].
   """
   from mjlab.sensor import CameraSensor
 
->>>>>>> Stashed changes
   sensor: CameraSensor = env.scene[sensor_name]
   depth = sensor.data.depth
   assert depth is not None
@@ -83,8 +63,4 @@ def process_depth_image(
   depth[torch.isnan(depth)] = far_clip
   depth[torch.isinf(depth)] = far_clip
   depth = torch.clamp(depth, near_clip, far_clip) - near_clip
-<<<<<<< Updated upstream
   return depth.reshape(env.num_envs, -1)  # [B, H*W]
-=======
-  return depth.reshape(env.num_envs, -1)  # [B, H*W]
->>>>>>> Stashed changes
