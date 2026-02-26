@@ -4,7 +4,11 @@ from mjlab.tasks.velocity.rl import VelocityOnPolicyRunner
 from .env_cfgs import (
   unitree_g1_flat_env_cfg,
   unitree_g1_rough_env_cfg,
+<<<<<<< Updated upstream
   unitree_g1_vision_rough_env_cfg
+=======
+  unitree_g1_vision_rough_env_cfg,
+>>>>>>> Stashed changes
 )
 from .rl_cfg import unitree_g1_ppo_runner_cfg
 
@@ -30,4 +34,8 @@ register_mjlab_task(
   play_env_cfg=unitree_g1_vision_rough_env_cfg(play=True),
   rl_cfg=unitree_g1_ppo_runner_cfg(),
   runner_cls=VelocityOnPolicyRunner,
+<<<<<<< Updated upstream
 )
+=======
+)
+>>>>>>> Stashed changes

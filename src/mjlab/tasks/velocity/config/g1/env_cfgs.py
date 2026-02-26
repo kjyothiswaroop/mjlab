@@ -9,7 +9,15 @@ from mjlab.envs import mdp as envs_mdp
 from mjlab.envs.mdp.actions import JointPositionActionCfg
 from mjlab.managers.event_manager import EventTermCfg
 from mjlab.managers.reward_manager import RewardTermCfg
+<<<<<<< Updated upstream
 from mjlab.sensor import ContactMatch, ContactSensorCfg, RayCastSensorCfg, CameraSensorCfg
+=======
+from mjlab.managers.termination_manager import TerminationTermCfg
+import mjlab.terrains as terrain_gen
+from mjlab.managers.observation_manager import ObservationTermCfg
+from mjlab.sensor import CameraSensorCfg, ContactMatch, ContactSensorCfg, RayCastSensorCfg
+from mjlab.utils.noise import UniformNoiseCfg as Unoise
+>>>>>>> Stashed changes
 from mjlab.tasks.velocity import mdp
 from mjlab.tasks.velocity.mdp import UniformVelocityCommandCfg
 from mjlab.tasks.velocity.velocity_env_cfg import make_velocity_env_cfg
@@ -206,14 +214,30 @@ def unitree_g1_flat_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
 
 
 def unitree_g1_vision_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
+<<<<<<< Updated upstream
   """G1 rough terrain config with depth camera observation (vision policy)."""
+=======
+  """G1 rough terrain config with depth camera observation (vision policy).
+
+  Replaces the height_scan actor observation with a flattened depth image
+  from a forward-facing camera mounted at the pelvis.
+
+  Camera orientation: quat=(0.5, 0.5, -0.5, -0.5) makes the camera look
+  forward (+X in pelvis frame). In MuJoCo, cameras look in the -Z direction
+  of their frame, so this rotation maps -Z_cam → +X_pelvis.
+  """
+>>>>>>> Stashed changes
   cfg = unitree_g1_rough_env_cfg(play=play)
 
   depth_camera = CameraSensorCfg(
     name="depth_sensor",
     parent_body="robot/pelvis",
     pos=(0.15, 0.0, 0.05),
+<<<<<<< Updated upstream
     quat=(0.5, 0.5, -0.5, -0.5),
+=======
+    quat=(0.5, 0.5, -0.5, -0.5),  # forward-facing: -Z_cam → +X_pelvis
+>>>>>>> Stashed changes
     width=30,
     height=53,
     fovy=58.0,
@@ -224,6 +248,27 @@ def unitree_g1_vision_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   )
   cfg.scene.sensors = (cfg.scene.sensors or ()) + (depth_camera,)
 
+<<<<<<< Updated upstream
+=======
+  # Terminate if torso (upper body) contacts terrain/obstacle geometry.
+  # Matches H1 vision approach: legs brushing past pillars is acceptable,
+  # torso contact is a clear failure. Depth camera provides early warning
+  # so the policy should avoid contact long before torso is reached.
+  upper_body_contact_cfg = ContactSensorCfg(
+    name="upper_body_terrain_contact",
+    primary=ContactMatch(mode="subtree", pattern="torso_link", entity="robot"),
+    secondary=ContactMatch(mode="body", pattern="terrain"),
+    fields=("found",),
+    reduce="none",
+    num_slots=1,
+  )
+  cfg.scene.sensors = (cfg.scene.sensors or ()) + (upper_body_contact_cfg,)
+  cfg.terminations["upper_body_contact"] = TerminationTermCfg(
+    func=mdp.illegal_contact,
+    params={"sensor_name": "upper_body_terrain_contact"},
+  )
+
+>>>>>>> Stashed changes
   del cfg.observations["actor"].terms["height_scan"]
   cfg.observations["actor"].terms["depth"] = ObservationTermCfg(
     func=mdp.process_depth_image,
@@ -231,4 +276,51 @@ def unitree_g1_vision_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     noise=Unoise(n_min=-0.05, n_max=0.05),
   )
 
+<<<<<<< Updated upstream
+=======
+  # Swap flat terrain (teaches nothing) for discrete obstacles, keeping all
+  # other locomotion terrains from ROUGH_TERRAINS_CFG. Matches H1 vision.
+  # Height fixed at 1.5m (always in frame, always blocks G1). Width (0.3→1.5m)
+  # is the curriculum variable: narrow pillars → wide walls.
+  assert cfg.scene.terrain is not None
+  assert cfg.scene.terrain.terrain_generator is not None
+  cfg.scene.terrain.terrain_generator.sub_terrains = {
+    "pyramid_stairs": terrain_gen.BoxPyramidStairsTerrainCfg(
+      proportion=0.1,
+      step_height_range=(0.0, 0.1),
+      step_width=0.3,
+      platform_width=3.0,
+      border_width=1.0,
+    ),
+    "pyramid_stairs_inv": terrain_gen.BoxInvertedPyramidStairsTerrainCfg(
+      proportion=0.1,
+      step_height_range=(0.0, 0.1),
+      step_width=0.3,
+      platform_width=3.0,
+      border_width=1.0,
+    ),
+    "hf_pyramid_slope": terrain_gen.HfPyramidSlopedTerrainCfg(
+      proportion=0.1,
+      slope_range=(0.0, 1.0),
+      platform_width=2.0,
+      border_width=0.25,
+    ),
+    "random_rough": terrain_gen.HfRandomUniformTerrainCfg(
+      proportion=0.1,
+      noise_range=(0.02, 0.10),
+      noise_step=0.02,
+      border_width=0.25,
+    ),
+    "discrete_obstacles": terrain_gen.HfDiscreteObstaclesTerrainCfg(
+      proportion=0.6,
+      obstacle_height_mode="fixed",
+      num_obstacles=10,
+      obstacle_height_range=(1.5, 1.5),
+      obstacle_width_range=(0.3, 1.5),
+      platform_width=1.0,
+      border_width=0.25,
+    ),
+  }
+
+>>>>>>> Stashed changes
   return cfg
