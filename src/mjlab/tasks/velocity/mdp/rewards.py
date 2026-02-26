@@ -259,6 +259,37 @@ def feet_slip(
   return cost
 
 
+def termination_penalty(env: ManagerBasedRlEnv) -> torch.Tensor:
+  """Penalize non-timeout episode termination (e.g. falling, obstacle collision).
+
+  Returns 1.0 for envs that terminated this step, 0.0 otherwise.
+  Apply a large negative weight (e.g. -200) to make collisions catastrophic.
+  """
+  return env.termination_manager.terminated.float()
+
+
+def stand_still_penalty(
+  env: ManagerBasedRlEnv,
+  command_name: str,
+  command_threshold: float = 0.1,
+  asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
+) -> torch.Tensor:
+  """Penalize joint deviation from default when velocity commands are small.
+
+  Prevents the robot from thrashing when stuck in front of an obstacle.
+  Only active when the commanded xy speed is below command_threshold.
+  """
+  asset: Entity = env.scene[asset_cfg.name]
+  command = env.command_manager.get_command(command_name)
+  assert command is not None
+  joint_pos = asset.data.joint_pos
+  default_joint_pos = asset.data.default_joint_pos
+  assert default_joint_pos is not None
+  deviation = torch.sum(torch.abs(joint_pos - default_joint_pos), dim=1)
+  small_command = torch.norm(command[:, :2], dim=1) < command_threshold
+  return deviation * small_command.float()
+
+
 def soft_landing(
   env: ManagerBasedRlEnv,
   sensor_name: str,

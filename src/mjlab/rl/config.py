@@ -109,6 +109,11 @@ class RslRlBaseRunnerCfg:
   """The checkpoint file to load. Default is "model_.*.pt" (all). If regex expression,
   the latest (alphabetical order) matching file will be loaded.
   """
+  load_strict: bool = True
+  """Whether to strictly enforce that checkpoint keys match the model.
+  Set to False to allow partial loading (e.g. fine-tuning a policy with a
+  different observation space where only hidden layers are reused).
+  """
   clip_actions: float | None = None
   """The clipping range for action values. If None (default), no clipping is applied."""
   upload_model: bool = True

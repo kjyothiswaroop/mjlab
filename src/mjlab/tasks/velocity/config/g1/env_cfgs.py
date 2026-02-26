@@ -220,8 +220,9 @@ def unitree_g1_vision_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   """
   cfg = unitree_g1_rough_env_cfg(play=play)
 
-  # Obstacle terrain has many more potential contacts than rough terrain.
-  cfg.sim.nconmax = 200
+  # Obstacle terrain has more potential contacts than rough terrain.
+  # 200 was too high (OOM at training scale); 64 is enough for obstacles.
+  cfg.sim.nconmax = 64
 
   depth_camera = CameraSensorCfg(
     name="depth_sensor",
@@ -254,6 +255,19 @@ def unitree_g1_vision_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   cfg.terminations["upper_body_contact"] = TerminationTermCfg(
     func=mdp.illegal_contact,
     params={"sensor_name": "upper_body_terrain_contact"},
+  )
+
+  # Large termination penalty: makes obstacle collision catastrophic.
+  # Go2 vision uses -200; this is the primary signal driving avoidance.
+  cfg.rewards["termination_penalty"] = RewardTermCfg(
+    func=mdp.termination_penalty,
+    weight=-200.0,
+  )
+  # Prevent robot from thrashing in front of a wall when stuck.
+  cfg.rewards["stand_still_penalty"] = RewardTermCfg(
+    func=mdp.stand_still_penalty,
+    params={"command_name": "twist"},
+    weight=-1.0,
   )
 
   del cfg.observations["actor"].terms["height_scan"]
