@@ -17,7 +17,6 @@ from mjlab.utils.noise import UniformNoiseCfg as Unoise
 from mjlab.tasks.velocity import mdp
 from mjlab.tasks.velocity.mdp import UniformVelocityCommandCfg
 from mjlab.tasks.velocity.velocity_env_cfg import make_velocity_env_cfg
-from mjlab.managers.observation_manager import ObservationTermCfg
 from mjlab.utils.noise import UniformNoiseCfg as Unoise
 
 
@@ -220,6 +219,9 @@ def unitree_g1_vision_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   of their frame, so this rotation maps -Z_cam → +X_pelvis.
   """
   cfg = unitree_g1_rough_env_cfg(play=play)
+
+  # Obstacle terrain has many more potential contacts than rough terrain.
+  cfg.sim.nconmax = 200
 
   depth_camera = CameraSensorCfg(
     name="depth_sensor",
