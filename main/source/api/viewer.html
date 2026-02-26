@@ -59,7 +59,7 @@
     <link rel="prev" title="mjlab.rl" href="rl.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Feb 24, 2026"/>
+    <meta name="docbuild:last-update" content="Feb 26, 2026"/>
   </head>
   
   
@@ -218,6 +218,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../training/rsl_rl.html">Training with RSL-RL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../viewers.html">Viewers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../training/distributed_training.html">Distributed Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../training/cloud.html">Cloud Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging/nan_guard.html">NaN Guard</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -459,6 +460,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.viewer.ViewerConfig"><code class="docutils literal notranslate"><span class="pre">ViewerConfig</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.viewer.ViewerConfig.lookat"><code class="docutils literal notranslate"><span class="pre">ViewerConfig.lookat</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.viewer.ViewerConfig.distance"><code class="docutils literal notranslate"><span class="pre">ViewerConfig.distance</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.viewer.ViewerConfig.fovy"><code class="docutils literal notranslate"><span class="pre">ViewerConfig.fovy</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.viewer.ViewerConfig.elevation"><code class="docutils literal notranslate"><span class="pre">ViewerConfig.elevation</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.viewer.ViewerConfig.azimuth"><code class="docutils literal notranslate"><span class="pre">ViewerConfig.azimuth</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.viewer.ViewerConfig.OriginType"><code class="docutils literal notranslate"><span class="pre">ViewerConfig.OriginType</span></code></a><ul class="nav section-nav flex-column">
@@ -587,6 +589,11 @@ document.write(`
 <dl class="py attribute">
 <dt class="sig sig-object py" id="mjlab.viewer.ViewerConfig.distance">
 <span class="sig-name descname"><span class="pre">distance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5.0</span></em><a class="headerlink" href="#mjlab.viewer.ViewerConfig.distance" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mjlab.viewer.ViewerConfig.fovy">
+<span class="sig-name descname"><span class="pre">fovy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#mjlab.viewer.ViewerConfig.fovy" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -900,6 +907,7 @@ the display smooth even at slow playback speeds.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.viewer.ViewerConfig"><code class="docutils literal notranslate"><span class="pre">ViewerConfig</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.viewer.ViewerConfig.lookat"><code class="docutils literal notranslate"><span class="pre">ViewerConfig.lookat</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.viewer.ViewerConfig.distance"><code class="docutils literal notranslate"><span class="pre">ViewerConfig.distance</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.viewer.ViewerConfig.fovy"><code class="docutils literal notranslate"><span class="pre">ViewerConfig.fovy</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.viewer.ViewerConfig.elevation"><code class="docutils literal notranslate"><span class="pre">ViewerConfig.elevation</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.viewer.ViewerConfig.azimuth"><code class="docutils literal notranslate"><span class="pre">ViewerConfig.azimuth</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.viewer.ViewerConfig.OriginType"><code class="docutils literal notranslate"><span class="pre">ViewerConfig.OriginType</span></code></a><ul class="nav section-nav flex-column">
@@ -1010,7 +1018,7 @@ By The mjlab Developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Feb 24, 2026.
+  Last updated on Feb 26, 2026.
   <br/>
 </p>
   </div>

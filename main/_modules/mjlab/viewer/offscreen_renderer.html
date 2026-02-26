@@ -56,7 +56,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Feb 24, 2026"/>
+    <meta name="docbuild:last-update" content="Feb 26, 2026"/>
   </head>
   
   
@@ -217,6 +217,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../source/training/rsl_rl.html">Training with RSL-RL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/viewers.html">Viewers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/training/distributed_training.html">Distributed Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/training/cloud.html">Cloud Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/debugging/nan_guard.html">NaN Guard</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -405,7 +406,7 @@ document.write(`
 
 <span class="c1"># Max number of envs to visualize (performance/memory limit).</span>
 <span class="c1"># See FAQ: &quot;How many environments can I visualize at once?&quot;</span>
-<span class="n">_MAX_ENVS</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">_MAX_EXTRA_ENVS</span> <span class="o">=</span> <span class="mi">2</span>
 
 
 <div class="viewcode-block" id="OffscreenRenderer">
@@ -418,9 +419,16 @@ document.write(`
     <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">model</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">mujoco</span><span class="o">.</span><span class="n">MjData</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="n">scene</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_orig_extent</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">stat</span><span class="o">.</span><span class="n">extent</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_render_extent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_render_extent</span><span class="p">()</span>
+    <span class="c1"># Keep extent override local to offscreen rendering so shadow/camera scaling</span>
+    <span class="c1"># is not dominated by the full multi-env world bounds.</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">stat</span><span class="o">.</span><span class="n">extent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_extent</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">vis</span><span class="o">.</span><span class="n">global_</span><span class="o">.</span><span class="n">offheight</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">height</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">vis</span><span class="o">.</span><span class="n">global_</span><span class="o">.</span><span class="n">offwidth</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">width</span>
+    <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">fovy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">cfg</span><span class="o">.</span><span class="n">origin_type</span> <span class="o">==</span> <span class="n">cfg</span><span class="o">.</span><span class="n">OriginType</span><span class="o">.</span><span class="n">WORLD</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">vis</span><span class="o">.</span><span class="n">global_</span><span class="o">.</span><span class="n">fovy</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">fovy</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">enable_shadows</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">light_castshadow</span><span class="p">[:]</span> <span class="o">=</span> <span class="kc">False</span>
@@ -463,7 +471,11 @@ document.write(`
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_renderer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
       <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Renderer not initialized. Call &#39;initialize()&#39; first.&quot;</span><span class="p">)</span>
 
-    <span class="n">env_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">env_idx</span>
+    <span class="n">nworld</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">nworld</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nworld</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">return</span>
+
+    <span class="n">env_idx</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">env_idx</span><span class="p">),</span> <span class="n">nworld</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">nq</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="n">env_idx</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">qvel</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">qvel</span><span class="p">[</span><span class="n">env_idx</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
@@ -471,6 +483,7 @@ document.write(`
       <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">mocap_pos</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">mocap_pos</span><span class="p">[</span><span class="n">env_idx</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">mocap_quat</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">mocap_quat</span><span class="p">[</span><span class="n">env_idx</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="n">mujoco</span><span class="o">.</span><span class="n">mj_forward</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
+
     <span class="n">cam</span> <span class="o">=</span> <span class="n">camera</span> <span class="k">if</span> <span class="n">camera</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cam</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_renderer</span><span class="o">.</span><span class="n">update_scene</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="n">cam</span><span class="p">)</span>
 
@@ -481,9 +494,8 @@ document.write(`
       <span class="p">)</span>
       <span class="n">debug_vis_callback</span><span class="p">(</span><span class="n">visualizer</span><span class="p">)</span>
 
-    <span class="c1"># Add additional environments as geoms.</span>
-    <span class="n">nworld</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">nworld</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">nworld</span><span class="p">,</span> <span class="n">_MAX_ENVS</span><span class="p">)):</span>
+    <span class="c1"># Add nearest neighboring environments as geoms for context.</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_extra_env_ids</span><span class="p">(</span><span class="n">nworld</span><span class="p">,</span> <span class="n">env_idx</span><span class="p">):</span>
       <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">nq</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">qpos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">qvel</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">qvel</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
@@ -500,6 +512,25 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_renderer</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span>
       <span class="p">)</span></div>
 
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_get_extra_env_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nworld</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">env_idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return nearest neighboring env ids to render as context.</span>
+
+<span class="sd">    We render a small local neighborhood around ``env_idx`` instead of the first</span>
+<span class="sd">    N environments, so videos stay focused on the tracked robot and nearby peers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">_MAX_EXTRA_ENVS</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">nworld</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+      <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">_MAX_EXTRA_ENVS</span><span class="p">,</span> <span class="n">nworld</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">origins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">env_origins</span><span class="p">[:</span><span class="n">nworld</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="n">ref</span> <span class="o">=</span> <span class="n">origins</span><span class="p">[</span><span class="n">env_idx</span><span class="p">]</span>
+    <span class="n">dist2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">origins</span> <span class="o">-</span> <span class="n">ref</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">dist2</span><span class="p">[</span><span class="n">env_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+    <span class="n">nearest</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argpartition</span><span class="p">(</span><span class="n">dist2</span><span class="p">,</span> <span class="n">kth</span><span class="o">=</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)[:</span><span class="n">k</span><span class="p">]</span>
+    <span class="n">nearest</span> <span class="o">=</span> <span class="n">nearest</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">dist2</span><span class="p">[</span><span class="n">nearest</span><span class="p">])]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">nearest</span><span class="p">]</span>
 
   <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_renderer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -566,7 +597,20 @@ document.write(`
   <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_renderer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_renderer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_renderer</span> <span class="o">=</span> <span class="kc">None</span></div>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_renderer</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="o">.</span><span class="n">stat</span><span class="o">.</span><span class="n">extent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orig_extent</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_compute_render_extent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute a stable extent for offscreen rendering.</span>
+
+<span class="sd">    MuJoCo scales z-near/z-far and shadow clip with ``model.stat.extent``. In large</span>
+<span class="sd">    scenes this auto extent can become very large, which causes shadow-map precision</span>
+<span class="sd">    artifacts in offscreen video rendering.</span>
+
+<span class="sd">    We therefore use a local extent tied to the active camera distance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Keep enough room for the tracked subject and camera motion.</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cfg</span><span class="o">.</span><span class="n">distance</span><span class="p">))</span></div>
 
 </pre></div>
 
@@ -615,7 +659,7 @@ By The mjlab Developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Feb 24, 2026.
+  Last updated on Feb 26, 2026.
   <br/>
 </p>
   </div>

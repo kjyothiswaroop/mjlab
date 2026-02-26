@@ -58,7 +58,7 @@
     <link rel="prev" title="FAQ &amp; Troubleshooting" href="faq.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Feb 24, 2026"/>
+    <meta name="docbuild:last-update" content="Feb 26, 2026"/>
   </head>
   
   
@@ -217,6 +217,7 @@
 <li class="toctree-l1"><a class="reference internal" href="training/rsl_rl.html">Training with RSL-RL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="viewers.html">Viewers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="training/distributed_training.html">Distributed Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="training/cloud.html">Cloud Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging/nan_guard.html">NaN Guard</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -501,8 +502,15 @@ of field expansion automatically.</p></li>
 <section id="added">
 <h3>Added<a class="headerlink" href="#added" title="Link to this heading">#</a></h3>
 <ul class="simple">
+<li><p>Cloud training support via <a class="reference external" href="https://skypilot.readthedocs.io/">SkyPilot</a>
+and Lambda Cloud, with documentation covering setup, monitoring, and
+cost management.</p></li>
+<li><p>W&amp;B hyperparameter sweep scripts that distribute one agent per GPU
+across a multi-GPU instance.</p></li>
 <li><p>Contributing guide with documentation for shared Claude Code commands
 (<code class="docutils literal notranslate"><span class="pre">/update-mjwarp</span></code>, <code class="docutils literal notranslate"><span class="pre">/commit-push-pr</span></code>).</p></li>
+<li><p>Added optional <code class="docutils literal notranslate"><span class="pre">ViewerConfig.fovy</span></code> and apply it in native viewer camera
+setup when provided.</p></li>
 <li><p>New <code class="docutils literal notranslate"><span class="pre">dr</span></code> module (<code class="docutils literal notranslate"><span class="pre">mjlab.envs.mdp.dr</span></code>) replacing <code class="docutils literal notranslate"><span class="pre">randomize_field</span></code>
 with typed per-field domain randomization functions. Each function
 automatically recomputes derived fields via <code class="docutils literal notranslate"><span class="pre">set_const</span></code>. Highlights:</p>
@@ -567,6 +575,11 @@ file uploads (<code class="docutils literal notranslate"><span class="pre">.pt</
 <li><p>Replaced the single <code class="docutils literal notranslate"><span class="pre">scale</span></code> parameter in <code class="docutils literal notranslate"><span class="pre">DifferentialIKActionCfg</span></code> with
 separate <code class="docutils literal notranslate"><span class="pre">delta_pos_scale</span></code> and <code class="docutils literal notranslate"><span class="pre">delta_ori_scale</span></code> for independent scaling
 of position and orientation components.</p></li>
+<li><p>Improved offscreen multi environment framing by selecting neighboring
+environments around the focused env instead of first N envs.</p></li>
+<li><p>Tuned tracking task viewer defaults for tighter camera framing.</p></li>
+<li><p>Disabled shadow casting on the G1 tracking light to avoid duplicate
+stacked shadows when robots are close.</p></li>
 </ul>
 </section>
 <section id="fixed">
@@ -584,6 +597,12 @@ for reporting and the initial fix (<a class="reference external" href="https://g
 <code class="docutils literal notranslate"><span class="pre">mocap_quat</span></code> (<a class="reference external" href="https://github.com/mujocolab/mjlab/pull/645">#645</a>).</p></li>
 <li><p>Fixed viser viewer crashing on scenes with no mocap bodies by adding
 an <code class="docutils literal notranslate"><span class="pre">nmocap</span></code> guard, matching the native viewer behavior.</p></li>
+<li><p>Fixed offscreen rendering artifacts in large vectorized scenes by applying
+a render local extent override in <code class="docutils literal notranslate"><span class="pre">OffscreenRenderer</span></code> and restoring the
+original extent on close.</p></li>
+<li><p>Fixed <code class="docutils literal notranslate"><span class="pre">RslRlVecEnvWrapper.unwrapped</span></code> to return the base environment,
+ensuring checkpoint state restore and logging work correctly when wrappers
+such as <code class="docutils literal notranslate"><span class="pre">VideoRecorder</span></code> are enabled.</p></li>
 </ul>
 </section>
 </section>
@@ -767,7 +786,7 @@ By The mjlab Developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Feb 24, 2026.
+  Last updated on Feb 26, 2026.
   <br/>
 </p>
   </div>

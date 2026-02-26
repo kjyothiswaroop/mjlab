@@ -59,7 +59,7 @@
     <link rel="prev" title="Welcome to mjlab!" href="../index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Feb 24, 2026"/>
+    <meta name="docbuild:last-update" content="Feb 26, 2026"/>
   </head>
   
   
@@ -218,6 +218,7 @@
 <li class="toctree-l1"><a class="reference internal" href="training/rsl_rl.html">Training with RSL-RL</a></li>
 <li class="toctree-l1"><a class="reference internal" href="viewers.html">Viewers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="training/distributed_training.html">Distributed Training</a></li>
+<li class="toctree-l1"><a class="reference internal" href="training/cloud.html">Cloud Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="debugging/nan_guard.html">NaN Guard</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
@@ -662,15 +663,31 @@ uv<span class="w"> </span>sync
 <li><p>Install an appropriate NVIDIA driver for your system and the
 <a class="reference external" href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html">NVIDIA Container Toolkit</a>.</p>
 <ul>
-<li><p>Be sure to register the container runtime with Docker and restart, as described in
-the Docker configuration section of the NVIDIA install guide.</p></li>
+<li><p>Be sure to register the container runtime with Docker and restart,
+as described in the Docker configuration section of the NVIDIA
+install guide.</p></li>
 </ul>
 </li>
 </ul>
-<p>Build and run:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>docker-build
-./scripts/run_docker.sh<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>demo
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-3">
+Pre-built image (recommended)</label><div class="sd-tab-content docutils">
+<p>Pull and run the latest image from the GitHub Container Registry:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--runtime<span class="o">=</span>nvidia<span class="w"> </span>--gpus<span class="w"> </span>all<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>ghcr.io/mujocolab/mjlab<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>demo
 </pre></div>
+</div>
+<p>The image is rebuilt on every push to <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p>
+</div>
+<input id="sd-tab-item-4" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-4">
+Local build</label><div class="sd-tab-content docutils">
+<p>Build from source and run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./scripts/run_docker.sh<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>demo
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="having-some-troubles">
@@ -786,7 +803,7 @@ By The mjlab Developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Feb 24, 2026.
+  Last updated on Feb 26, 2026.
   <br/>
 </p>
   </div>
