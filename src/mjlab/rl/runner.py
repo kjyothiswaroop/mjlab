@@ -37,6 +37,9 @@ class MjlabOnPolicyRunner(OnPolicyRunner):
     onnx_model = self.alg.get_policy().as_onnx(verbose=verbose)
     onnx_model.to("cpu")
     onnx_model.eval()
+    # as_onnx() shallow-copies CNN submodules, so onnx_model.to("cpu") moves the
+    # actor's shared CNN weights to CPU too. Restore the actor to the training device.
+    self.alg.get_policy().to(self.device)
     os.makedirs(path, exist_ok=True)
     torch.onnx.export(
       onnx_model,

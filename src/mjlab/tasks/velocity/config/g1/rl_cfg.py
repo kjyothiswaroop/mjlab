@@ -17,9 +17,10 @@ def unitree_g1_vision_ppo_runner_cfg() -> RslRlOnPolicyRunnerCfg:
 
   CNN architecture for 30×53 depth input:
     Conv(1→16, k=5) → MaxPool  →  (25, 13)
-    Conv(16→32, k=3) → MaxPool →  (12, 6)
-    Flatten → 2304 dims
-  Combined latent (proprio MLP + CNN): fed into hidden_dims MLP → actions.
+    Conv(16→128, k=3) → MaxPool →  (12, 6)
+    GlobalAvgPool → (1, 1) → Flatten → 128 dims
+  Matches Go2 depth latent size (128). Combined latent (proprio + CNN):
+  fed into hidden_dims MLP → actions.
   """
   return RslRlOnPolicyRunnerCfg(
     actor=RslRlModelCfg(
@@ -30,10 +31,11 @@ def unitree_g1_vision_ppo_runner_cfg() -> RslRlOnPolicyRunnerCfg:
       init_noise_std=1.0,
       class_name="CNNModel",
       cnn_cfg={
-        "output_channels": [16, 32],
+        "output_channels": [16, 128],
         "kernel_size": [5, 3],
         "max_pool": [True, True],
         "activation": "elu",
+        "global_pool": "avg",
       },
     ),
     critic=RslRlModelCfg(
