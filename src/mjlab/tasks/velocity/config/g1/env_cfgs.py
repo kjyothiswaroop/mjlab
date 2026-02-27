@@ -220,9 +220,9 @@ def unitree_g1_vision_flat_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   cfg = unitree_g1_vision_rough_env_cfg(play=play)
 
   cfg.sim.njmax = 300
-  cfg.sim.mujoco.ccd_iterations = 500
+  cfg.sim.mujoco.ccd_iterations = 100
   cfg.sim.contact_sensor_maxmatch = 64
-  cfg.sim.nconmax = None  # Mild terrain has few contacts.
+  cfg.sim.nconmax = 64
 
   # Remove obstacle-specific rewards and termination — no pillars in Stage 1.
   del cfg.rewards["obstacle_contact"]
