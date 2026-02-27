@@ -63,4 +63,4 @@ def process_depth_image(
   depth[torch.isnan(depth)] = far_clip
   depth[torch.isinf(depth)] = far_clip
   depth = torch.clamp(depth, near_clip, far_clip) - near_clip
-  return depth.reshape(env.num_envs, -1)  # [B, H*W]
+  return depth.unsqueeze(1)  # [B, 1, H, W] — preserved for CNN encoder

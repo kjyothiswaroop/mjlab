@@ -11,7 +11,7 @@ from mjlab.managers.event_manager import EventTermCfg
 from mjlab.managers.reward_manager import RewardTermCfg
 from mjlab.managers.termination_manager import TerminationTermCfg
 import mjlab.terrains as terrain_gen
-from mjlab.managers.observation_manager import ObservationTermCfg
+from mjlab.managers.observation_manager import ObservationGroupCfg, ObservationTermCfg
 from mjlab.sensor import CameraSensorCfg, ContactMatch, ContactSensorCfg, RayCastSensorCfg
 from mjlab.utils.noise import UniformNoiseCfg as Unoise
 from mjlab.tasks.velocity import mdp
@@ -208,6 +208,59 @@ def unitree_g1_flat_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   return cfg
 
 
+def unitree_g1_vision_flat_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
+  """G1 mild mixed terrain config with depth camera (Stage 1 vision training).
+
+  Terrain: 50% flat, 25% pyramid stairs (0-10cm steps, curriculum-scaled),
+  25% random rough (2-5cm bumps). The critic retains height_scan as privileged
+  info; the actor obs are identical to unitree_g1_vision_rough_env_cfg (prop
+  MLP + depth CNN), so Stage-2 fine-tuning with load_strict=True works without
+  any dimension mismatch.
+  """
+  cfg = unitree_g1_vision_rough_env_cfg(play=play)
+
+  cfg.sim.njmax = 300
+  cfg.sim.mujoco.ccd_iterations = 50
+  cfg.sim.contact_sensor_maxmatch = 64
+  cfg.sim.nconmax = None  # Mild terrain has few contacts.
+
+  # Remove obstacle-specific reward and termination — no pillars in Stage 1.
+  # obstacle_contact sensor can misfire if a knee clips a stair edge.
+  # upper_body_contact was for walking into pillars while upright; fell_over
+  # (70° tilt) is sufficient to detect falls on mild terrain.
+  del cfg.rewards["obstacle_contact"]
+  del cfg.terminations["upper_body_contact"]
+
+  # Replace obstacle terrain with mild mixed terrain.
+  # The actor has no height_scan (replaced by depth camera), but the critic
+  # retains it as privileged info via the terrain_scan raycaster.
+  assert cfg.scene.terrain is not None
+  assert cfg.scene.terrain.terrain_generator is not None
+  cfg.scene.terrain.terrain_generator.sub_terrains = {
+    "flat": terrain_gen.BoxFlatTerrainCfg(proportion=0.5),
+    "pyramid_stairs": terrain_gen.BoxPyramidStairsTerrainCfg(
+      proportion=0.25,
+      step_height_range=(0.0, 0.1),
+      step_width=0.3,
+      platform_width=1.0,
+    ),
+    "random_rough": terrain_gen.HfRandomUniformTerrainCfg(
+      proportion=0.25,
+      noise_range=(0.02, 0.05),
+      noise_step=0.01,
+      border_width=0.25,
+    ),
+  }
+
+  if play:
+    twist_cmd = cfg.commands["twist"]
+    assert isinstance(twist_cmd, UniformVelocityCommandCfg)
+    twist_cmd.ranges.lin_vel_x = (-1.5, 2.0)
+    twist_cmd.ranges.ang_vel_z = (-0.7, 0.7)
+
+  return cfg
+
+
 def unitree_g1_vision_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   """G1 rough terrain config with depth camera observation (vision policy).
 
@@ -220,9 +273,10 @@ def unitree_g1_vision_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   """
   cfg = unitree_g1_rough_env_cfg(play=play)
 
-  # Obstacle terrain has more potential contacts than rough terrain.
-  # 200 was too high (OOM at training scale); 64 is enough for obstacles.
-  cfg.sim.nconmax = 64
+  # nconmax scales with num_envs on GPU. At training scale (2048 envs) 200
+  # caused OOM; 64 is the safe training limit. In play mode we run 1 env so
+  # we can use a higher value to avoid broadphase overflow on dense obstacles.
+  cfg.sim.nconmax = 150 if play else 64
 
   depth_camera = CameraSensorCfg(
     name="depth_sensor",
@@ -257,11 +311,40 @@ def unitree_g1_vision_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     params={"sensor_name": "upper_body_terrain_contact"},
   )
 
+  # Continuous leg-obstacle contact penalty: penalises leg brushing before
+  # the torso reaches the obstacle and termination fires. Matches Go2 vision
+  # approach but uses leg bodies (hip/knee) that normally don't touch ground.
+  leg_obstacle_contact_cfg = ContactSensorCfg(
+    name="leg_obstacle_contact",
+    primary=ContactMatch(
+      mode="subtree",
+      pattern=r"^(left_hip_yaw_link|left_hip_roll_link|left_hip_pitch_link"
+              r"|left_knee_link|right_hip_yaw_link|right_hip_roll_link"
+              r"|right_hip_pitch_link|right_knee_link)$",
+      entity="robot",
+    ),
+    secondary=ContactMatch(mode="body", pattern="terrain"),
+    fields=("found", "force"),
+    reduce="netforce",
+    num_slots=1,
+  )
+  cfg.scene.sensors = (cfg.scene.sensors or ()) + (leg_obstacle_contact_cfg,)
+
   # Large termination penalty: makes obstacle collision catastrophic.
   # Go2 vision uses -200; this is the primary signal driving avoidance.
   cfg.rewards["termination_penalty"] = RewardTermCfg(
     func=mdp.termination_penalty,
     weight=-200.0,
+  )
+  # Continuous contact force penalty for leg-obstacle brushing.
+  # Provides gradient before the termination cliff (Go2 vision uses -5.0).
+  cfg.rewards["obstacle_contact"] = RewardTermCfg(
+    func=mdp.obstacle_contact_penalty,
+    weight=-5.0,
+    params={
+      "sensor_name": leg_obstacle_contact_cfg.name,
+      "force_threshold": 1.0,
+    },
   )
   # Prevent robot from thrashing in front of a wall when stuck.
   cfg.rewards["stand_still_penalty"] = RewardTermCfg(
@@ -269,49 +352,54 @@ def unitree_g1_vision_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
     params={"command_name": "twist"},
     weight=-1.0,
   )
+  # Torque and acceleration regularisers — present in legged-loco G1/H1 vision,
+  # help produce smooth energy-efficient motion.
+  cfg.rewards["dof_torques_l2"] = RewardTermCfg(
+    func=envs_mdp.joint_torques_l2,
+    weight=-1.5e-7,
+  )
+  cfg.rewards["dof_acc_l2"] = RewardTermCfg(
+    func=envs_mdp.joint_acc_l2,
+    weight=-1.25e-7,
+  )
+  # Re-enable air time: encourages proper biped stepping gait.
+  # Was 0.0 for rough terrain G1 (relying on foot_clearance penalty instead),
+  # but legged-loco G1 vision uses 0.25 — stepping actively rewarded.
+  cfg.rewards["air_time"].weight = 0.1
+  # Reduce action rate penalty from base -0.1 → -0.005 so the policy can
+  # react quickly to obstacles it sees in the depth image.
+  cfg.rewards["action_rate_l2"].weight = -0.005
 
   del cfg.observations["actor"].terms["height_scan"]
-  cfg.observations["actor"].terms["depth"] = ObservationTermCfg(
-    func=mdp.process_depth_image,
-    params={"sensor_name": "depth_sensor"},
-    noise=Unoise(n_min=-0.05, n_max=0.05),
+  # Depth image lives in its own obs group so the CNNModel can route it
+  # through a CNN encoder. If it were concatenated into "actor" with the
+  # 1D proprioceptive obs, the MLP would receive raw pixels with no spatial
+  # inductive bias. The runner obs_groups config maps the "actor" obs set to
+  # both ("actor", "actor_depth") groups.
+  cfg.observations["actor_depth"] = ObservationGroupCfg(
+    terms={
+      "depth": ObservationTermCfg(
+        func=mdp.process_depth_image,
+        params={"sensor_name": "depth_sensor"},
+        noise=Unoise(n_min=-0.05, n_max=0.05),
+      ),
+    },
+    concatenate_terms=True,
+    enable_corruption=True,
   )
 
-  # Swap flat terrain (teaches nothing) for discrete obstacles, keeping all
-  # other locomotion terrains from ROUGH_TERRAINS_CFG. Matches H1 vision.
-  # Height fixed at 1.5m (always in frame, always blocks G1). Width (0.3→1.5m)
-  # is the curriculum variable: narrow pillars → wide walls.
+  # Use only discrete obstacles — the actor obs has no height_scan (replaced
+  # by depth camera), so the robot is blind to terrain underfoot. Rough terrain
+  # types (stairs, slopes) cause falls and joint instability since the
+  # pre-trained walking policy can no longer perceive the ground. Obstacle-only
+  # terrain matches the Go2 vision approach: the pre-trained gait handles flat
+  # ground, the depth camera handles obstacle avoidance. Obstacle width
+  # (0.3→1.5m) is the curriculum variable: narrow pillars first → wide walls.
   assert cfg.scene.terrain is not None
   assert cfg.scene.terrain.terrain_generator is not None
   cfg.scene.terrain.terrain_generator.sub_terrains = {
-    "pyramid_stairs": terrain_gen.BoxPyramidStairsTerrainCfg(
-      proportion=0.1,
-      step_height_range=(0.0, 0.1),
-      step_width=0.3,
-      platform_width=3.0,
-      border_width=1.0,
-    ),
-    "pyramid_stairs_inv": terrain_gen.BoxInvertedPyramidStairsTerrainCfg(
-      proportion=0.1,
-      step_height_range=(0.0, 0.1),
-      step_width=0.3,
-      platform_width=3.0,
-      border_width=1.0,
-    ),
-    "hf_pyramid_slope": terrain_gen.HfPyramidSlopedTerrainCfg(
-      proportion=0.1,
-      slope_range=(0.0, 1.0),
-      platform_width=2.0,
-      border_width=0.25,
-    ),
-    "random_rough": terrain_gen.HfRandomUniformTerrainCfg(
-      proportion=0.1,
-      noise_range=(0.02, 0.10),
-      noise_step=0.02,
-      border_width=0.25,
-    ),
     "discrete_obstacles": terrain_gen.HfDiscreteObstaclesTerrainCfg(
-      proportion=0.6,
+      proportion=1.0,
       obstacle_height_mode="fixed",
       num_obstacles=10,
       obstacle_height_range=(1.5, 1.5),

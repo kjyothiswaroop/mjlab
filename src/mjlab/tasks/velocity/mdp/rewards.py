@@ -259,6 +259,25 @@ def feet_slip(
   return cost
 
 
+def obstacle_contact_penalty(
+  env: ManagerBasedRlEnv,
+  sensor_name: str,
+  force_threshold: float = 1.0,
+) -> torch.Tensor:
+  """Penalize contact force with obstacles (continuous signal, does not terminate).
+
+  Returns the sum of contact forces above force_threshold for each env.
+  Provides a gradient before the termination cliff so the robot learns that
+  brushing an obstacle is already costly, not just full collision.
+  """
+  sensor: ContactSensor = env.scene[sensor_name]
+  assert sensor.data.force is not None
+  forces = sensor.data.force  # [B, N, 3]
+  force_magnitude = torch.norm(forces, dim=-1)  # [B, N]
+  above_threshold = torch.clamp(force_magnitude - force_threshold, min=0.0)
+  return torch.sum(above_threshold, dim=1)
+
+
 def termination_penalty(env: ManagerBasedRlEnv) -> torch.Tensor:
   """Penalize non-timeout episode termination (e.g. falling, obstacle collision).
 
