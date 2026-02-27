@@ -8,19 +8,11 @@ from mjlab.rl import (
 
 
 def unitree_g1_vision_ppo_runner_cfg() -> RslRlOnPolicyRunnerCfg:
-  """RL runner config for G1 vision policy with CNN depth encoder.
+  """RL runner config for G1 vision policy with flattened depth MLP.
 
-  The actor uses CNNModel: proprioceptive obs ("actor" group, 1D) go through
-  an MLP stream while depth image ("actor_depth" group, shape B×1×H×W) goes
-  through a CNN encoder. Both latents are concatenated before the shared MLP
-  head — matching the legged-loco DepthOnlyFCBackbone dual-stream approach.
-
-  CNN architecture for 30×53 depth input:
-    Conv(1→16, k=5) → MaxPool  →  (25, 13)
-    Conv(16→128, k=3) → MaxPool →  (12, 6)
-    GlobalAvgPool → (1, 1) → Flatten → 128 dims
-  Matches Go2 depth latent size (128). Combined latent (proprio + CNN):
-  fed into hidden_dims MLP → actions.
+  Depth image (30×53 = 1590 dims) is flattened and concatenated with
+  proprioceptive obs directly into the actor input, matching the
+  legged-loco G1 vision MLP approach.
   """
   return RslRlOnPolicyRunnerCfg(
     actor=RslRlModelCfg(
@@ -29,14 +21,6 @@ def unitree_g1_vision_ppo_runner_cfg() -> RslRlOnPolicyRunnerCfg:
       obs_normalization=True,
       stochastic=True,
       init_noise_std=1.0,
-      class_name="CNNModel",
-      cnn_cfg={
-        "output_channels": [16, 128],
-        "kernel_size": [5, 3],
-        "max_pool": [True, True],
-        "activation": "elu",
-        "global_pool": "avg",
-      },
     ),
     critic=RslRlModelCfg(
       hidden_dims=(512, 256, 128),
@@ -45,7 +29,6 @@ def unitree_g1_vision_ppo_runner_cfg() -> RslRlOnPolicyRunnerCfg:
       stochastic=False,
       init_noise_std=1.0,
     ),
-    obs_groups={"actor": ("actor", "actor_depth"), "critic": ("critic",)},
     algorithm=RslRlPpoAlgorithmCfg(
       value_loss_coef=1.0,
       use_clipped_value_loss=True,

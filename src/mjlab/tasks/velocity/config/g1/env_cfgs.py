@@ -11,7 +11,7 @@ from mjlab.managers.event_manager import EventTermCfg
 from mjlab.managers.reward_manager import RewardTermCfg
 from mjlab.managers.termination_manager import TerminationTermCfg
 import mjlab.terrains as terrain_gen
-from mjlab.managers.observation_manager import ObservationGroupCfg, ObservationTermCfg
+from mjlab.managers.observation_manager import ObservationTermCfg
 from mjlab.sensor import CameraSensorCfg, ContactMatch, ContactSensorCfg, RayCastSensorCfg
 from mjlab.utils.noise import UniformNoiseCfg as Unoise
 from mjlab.tasks.velocity import mdp
@@ -371,21 +371,12 @@ def unitree_g1_vision_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   cfg.rewards["action_rate_l2"].weight = -0.005
 
   del cfg.observations["actor"].terms["height_scan"]
-  # Depth image lives in its own obs group so the CNNModel can route it
-  # through a CNN encoder. If it were concatenated into "actor" with the
-  # 1D proprioceptive obs, the MLP would receive raw pixels with no spatial
-  # inductive bias. The runner obs_groups config maps the "actor" obs set to
-  # both ("actor", "actor_depth") groups.
-  cfg.observations["actor_depth"] = ObservationGroupCfg(
-    terms={
-      "depth": ObservationTermCfg(
-        func=mdp.process_depth_image,
-        params={"sensor_name": "depth_sensor"},
-        noise=Unoise(n_min=-0.05, n_max=0.05),
-      ),
-    },
-    concatenate_terms=True,
-    enable_corruption=True,
+  # Depth image flattened to [B, H*W] and concatenated directly into the
+  # actor obs group, matching the legged-loco G1 vision MLP approach.
+  cfg.observations["actor"].terms["depth"] = ObservationTermCfg(
+    func=mdp.process_depth_image,
+    params={"sensor_name": "depth_sensor"},
+    noise=Unoise(n_min=-0.05, n_max=0.05),
   )
 
   # Use only discrete obstacles — the actor obs has no height_scan (replaced
