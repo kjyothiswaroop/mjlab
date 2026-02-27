@@ -220,7 +220,7 @@ def unitree_g1_vision_flat_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   cfg = unitree_g1_vision_rough_env_cfg(play=play)
 
   cfg.sim.njmax = 300
-  cfg.sim.mujoco.ccd_iterations = 50
+  cfg.sim.mujoco.ccd_iterations = 500
   cfg.sim.contact_sensor_maxmatch = 64
   cfg.sim.nconmax = None  # Mild terrain has few contacts.
 
