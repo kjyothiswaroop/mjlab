@@ -224,12 +224,17 @@ def unitree_g1_vision_flat_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   cfg.sim.contact_sensor_maxmatch = 64
   cfg.sim.nconmax = None  # Mild terrain has few contacts.
 
-  # Remove obstacle-specific reward and termination — no pillars in Stage 1.
-  # obstacle_contact sensor can misfire if a knee clips a stair edge.
-  # upper_body_contact was for walking into pillars while upright; fell_over
-  # (70° tilt) is sufficient to detect falls on mild terrain.
+  # Remove obstacle-specific rewards and termination — no pillars in Stage 1.
   del cfg.rewards["obstacle_contact"]
+  del cfg.rewards["stand_still_penalty"]
+  del cfg.rewards["dof_torques_l2"]
+  del cfg.rewards["dof_acc_l2"]
+  del cfg.rewards["termination_penalty"]
   del cfg.terminations["upper_body_contact"]
+
+  # Revert action_rate weight to the standard value (was reduced to allow
+  # fast reactions to obstacles).
+  cfg.rewards["action_rate_l2"].weight = -0.1
 
   # Replace obstacle terrain with mild mixed terrain.
   # The actor has no height_scan (replaced by depth camera), but the critic
