@@ -222,7 +222,10 @@ def unitree_g1_vision_flat_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   cfg.sim.njmax = 300
   cfg.sim.mujoco.ccd_iterations = 500
   cfg.sim.contact_sensor_maxmatch = 500
-  cfg.sim.nconmax = 45
+  # nconmax=45 caps contacts per env to prevent OOM during training (2048 envs).
+  # In play mode (1 env) OOM is not a concern, so use None to let mjwarp
+  # auto-compute — the mild mixed terrain can exceed 45 contacts at init.
+  cfg.sim.nconmax = None if play else 45
 
   # Remove obstacle-specific rewards and termination — no pillars in Stage 1.
   del cfg.rewards["obstacle_contact"]
