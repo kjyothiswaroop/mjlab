@@ -35,10 +35,19 @@ class MjlabOnPolicyRunner(OnPolicyRunner):
     dynamic_axes being deprecated with the new TorchDynamo export path
     (torch>=2.9 default).
     """
-    # Deep copy the policy before creating the ONNX model so that as_onnx()'s
-    # shallow CNN copies point to the copy's modules, not the live actor's.
-    # This prevents onnx_model.to("cpu") from corrupting the actor's CNN weights.
-    policy_copy = copy.deepcopy(self.alg.get_policy()).to("cpu")
+    # Serialize to BytesIO and reload on CPU instead of deepcopy.
+    # deepcopy raises "Only graph leaves support the deepcopy protocol" when
+    # the policy contains non-leaf tensors (e.g. obs normalizer cached stats).
+    # torch.save/load avoids this: it saves only tensor data (detaching from
+    # the computation graph), and map_location="cpu" puts everything on CPU.
+    # weights_only=False is safe here — we are loading our own in-memory object,
+    # not an untrusted file.
+    import io
+    policy = self.alg.get_policy()
+    buf = io.BytesIO()
+    torch.save(policy, buf)
+    buf.seek(0)
+    policy_copy = torch.load(buf, map_location="cpu", weights_only=False)
     onnx_model = policy_copy.as_onnx(verbose=verbose)
     onnx_model.eval()
     os.makedirs(path, exist_ok=True)
