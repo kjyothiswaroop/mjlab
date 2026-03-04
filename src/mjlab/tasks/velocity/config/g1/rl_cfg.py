@@ -8,11 +8,12 @@ from mjlab.rl import (
 
 
 def unitree_g1_vision_ppo_runner_cfg() -> RslRlOnPolicyRunnerCfg:
-  """RL runner config for G1 vision policy with flattened depth MLP.
+  """RL runner config for G1 vision policy (height-map MLP).
 
-  Depth image (30×53 = 1590 dims) is flattened and concatenated with
-  proprioceptive obs directly into the actor input, matching the
-  legged-loco G1 vision MLP approach.
+  Actor obs: proprioceptive (~99 dims) + height_map_depth (20×20=400 dims).
+  The depth image is back-projected to a 2.5D height map in the robot frame
+  before being fed to the MLP, avoiding the sim-to-real domain gap of raw
+  pixel inputs.
   """
   return RslRlOnPolicyRunnerCfg(
     actor=RslRlModelCfg(

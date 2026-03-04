@@ -288,9 +288,9 @@ def unitree_g1_vision_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
 
   depth_camera = CameraSensorCfg(
     name="depth_sensor",
-    parent_body="robot/pelvis",
-    pos=(0.15, 0.0, 0.05),
-    quat=(0.5, 0.5, -0.5, -0.5),  # forward-facing: -Z_cam → +X_pelvis
+    parent_body="robot/torso_link",
+    pos=(0.20, 0.0, 0.0),
+    quat=(0.5, 0.5, -0.5, -0.5),  # forward-facing: -Z_cam → +X_torso
     width=30,
     height=53,
     fovy=58.0,
@@ -379,26 +379,32 @@ def unitree_g1_vision_rough_env_cfg(play: bool = False) -> ManagerBasedRlEnvCfg:
   cfg.rewards["action_rate_l2"].weight = -0.005
 
   del cfg.observations["actor"].terms["height_scan"]
-  # Depth image flattened to [B, H*W] and concatenated directly into the
-  # actor obs group, matching the legged-loco G1 vision MLP approach.
+  # Depth image → 2.5D height map (20×20=400 dims) in robot body frame.
+  # Uses the same approach as Go2 NaVILA height_map_lidar to avoid the
+  # sim-to-real domain gap of raw depth pixels fed to an MLP.
   cfg.observations["actor"].terms["depth"] = ObservationTermCfg(
-    func=mdp.process_depth_image,
+    func=mdp.height_map_depth,
     params={"sensor_name": "depth_sensor"},
     noise=Unoise(n_min=-0.05, n_max=0.05),
   )
 
-  # Use only discrete obstacles — the actor obs has no height_scan (replaced
-  # by depth camera), so the robot is blind to terrain underfoot. Rough terrain
-  # types (stairs, slopes) cause falls and joint instability since the
-  # pre-trained walking policy can no longer perceive the ground. Obstacle-only
-  # terrain matches the Go2 vision approach: the pre-trained gait handles flat
-  # ground, the depth camera handles obstacle avoidance. Obstacle width
-  # (0.3→1.5m) is the curriculum variable: narrow pillars first → wide walls.
+  # Mixed terrain: 30% flat + 10% rough + 60% obstacles.
+  # Flat terrain lets the pre-trained gait practice normal walking without
+  # needing height_scan (replaced by depth camera). Rough terrain adds
+  # generalisation. Obstacles are the primary training objective for the
+  # depth-camera avoidance policy. This matches the Go2 NaVILA proportions.
   assert cfg.scene.terrain is not None
   assert cfg.scene.terrain.terrain_generator is not None
   cfg.scene.terrain.terrain_generator.sub_terrains = {
+    "flat": terrain_gen.BoxFlatTerrainCfg(proportion=0.3),
+    "random_rough": terrain_gen.HfRandomUniformTerrainCfg(
+      proportion=0.1,
+      noise_range=(0.02, 0.05),
+      noise_step=0.01,
+      border_width=0.25,
+    ),
     "discrete_obstacles": terrain_gen.HfDiscreteObstaclesTerrainCfg(
-      proportion=1.0,
+      proportion=0.6,
       obstacle_height_mode="fixed",
       num_obstacles=10,
       obstacle_height_range=(1.5, 1.5),
