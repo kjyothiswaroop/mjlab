@@ -56,7 +56,7 @@
     <link rel="search" title="Search" href="../../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Feb 26, 2026"/>
+    <meta name="docbuild:last-update" content="Mar 07, 2026"/>
   </head>
   
   
@@ -219,6 +219,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../source/training/distributed_training.html">Distributed Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../source/training/cloud.html">Cloud Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../source/debugging/nan_guard.html">NaN Guard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/debugging/export_scene.html">Export Scene</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="nav bd-sidenav">
@@ -242,6 +243,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../source/motivation.html">Why mjlab?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../source/migration_isaac_lab.html">Migrating from Isaac Lab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../source/faq.html">FAQ &amp; Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source/research.html">Research</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../source/changelog.html">Changelog</a></li>
 </ul>
 
@@ -400,18 +402,34 @@ document.write(`
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">threading</span><span class="w"> </span><span class="kn">import</span> <span class="n">Lock</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">viser</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing_extensions</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.sensor</span><span class="w"> </span><span class="kn">import</span> <span class="n">CameraSensor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.sim.sim</span><span class="w"> </span><span class="kn">import</span> <span class="n">Simulation</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.viewer.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseViewer</span><span class="p">,</span> <span class="n">EnvProtocol</span><span class="p">,</span> <span class="n">PolicyProtocol</span><span class="p">,</span> <span class="n">VerbosityLevel</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.viewer.viser.camera_viewer</span><span class="w"> </span><span class="kn">import</span> <span class="n">ViserCameraViewer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.viewer.base</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+  <span class="n">BaseViewer</span><span class="p">,</span>
+  <span class="n">EnvProtocol</span><span class="p">,</span>
+  <span class="n">PolicyProtocol</span><span class="p">,</span>
+  <span class="n">VerbosityLevel</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.viewer.viser.overlays</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+  <span class="n">ViserCameraOverlays</span><span class="p">,</span>
+  <span class="n">ViserContactOverlays</span><span class="p">,</span>
+  <span class="n">ViserDebugOverlays</span><span class="p">,</span>
+  <span class="n">ViserTermOverlays</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.viewer.viser.scene</span><span class="w"> </span><span class="kn">import</span> <span class="n">ViserMujocoScene</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.viewer.viser.term_plotter</span><span class="w"> </span><span class="kn">import</span> <span class="n">ViserTermPlotter</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">UpdateReason</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+  <span class="n">ACTION</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+  <span class="n">ENV_SWITCH</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+  <span class="n">SCENE_REQUEST</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="ViserPlayViewer">
@@ -427,12 +445,21 @@ document.write(`
     <span class="n">policy</span><span class="p">:</span> <span class="n">PolicyProtocol</span><span class="p">,</span>
     <span class="n">frame_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span><span class="p">,</span>
     <span class="n">verbosity</span><span class="p">:</span> <span class="n">VerbosityLevel</span> <span class="o">=</span> <span class="n">VerbosityLevel</span><span class="o">.</span><span class="n">SILENT</span><span class="p">,</span>
+    <span class="n">viser_server</span><span class="p">:</span> <span class="n">viser</span><span class="o">.</span><span class="n">ViserServer</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
   <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="n">frame_rate</span><span class="p">,</span> <span class="n">verbosity</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_reward_plotter</span><span class="p">:</span> <span class="n">ViserTermPlotter</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_plotter</span><span class="p">:</span> <span class="n">ViserTermPlotter</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_term_overlays</span><span class="p">:</span> <span class="n">ViserTermOverlays</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_camera_overlays</span><span class="p">:</span> <span class="n">ViserCameraOverlays</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_debug_overlays</span><span class="p">:</span> <span class="n">ViserDebugOverlays</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_contact_overlays</span><span class="p">:</span> <span class="n">ViserContactOverlays</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_sim_lock</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_camera_viewers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ViserCameraViewer</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span></div>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_camera_update_last_ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_debug_queue_last_ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_scene_submit_enqueue_last_ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_scene_update_last_ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_timing_last_log_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_external_server</span> <span class="o">=</span> <span class="n">viser_server</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_server</span> <span class="o">=</span> <span class="n">viser_server</span> <span class="ow">or</span> <span class="n">viser</span><span class="o">.</span><span class="n">ViserServer</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;mjlab&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ViserPlayViewer.setup">
@@ -443,10 +470,9 @@ document.write(`
     <span class="n">sim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">sim</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sim</span><span class="p">,</span> <span class="n">Simulation</span><span class="p">)</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">_server</span> <span class="o">=</span> <span class="n">viser</span><span class="o">.</span><span class="n">ViserServer</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;mjlab&quot;</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_threadpool</span> <span class="o">=</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_counter</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_needs_update</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_pending_update_reasons</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">UpdateReason</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
     <span class="c1"># Create ViserMujocoScene for all 3D visualization (with debug visualization enabled).</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="n">ViserMujocoScene</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
@@ -480,7 +506,16 @@ document.write(`
         <span class="nd">@self</span><span class="o">.</span><span class="n">_pause_button</span><span class="o">.</span><span class="n">on_click</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">_</span><span class="p">(</span><span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
           <span class="bp">self</span><span class="o">.</span><span class="n">request_toggle_pause</span><span class="p">()</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">_needs_update</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Single-step button.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_step_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">add_button</span><span class="p">(</span>
+          <span class="s2">&quot;Step&quot;</span><span class="p">,</span>
+          <span class="n">icon</span><span class="o">=</span><span class="n">viser</span><span class="o">.</span><span class="n">Icon</span><span class="o">.</span><span class="n">PLAYER_TRACK_NEXT</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="nd">@self</span><span class="o">.</span><span class="n">_step_button</span><span class="o">.</span><span class="n">on_click</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_</span><span class="p">(</span><span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">request_single_step</span><span class="p">()</span>
 
         <span class="c1"># Reset button.</span>
         <span class="n">reset_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">add_button</span><span class="p">(</span><span class="s2">&quot;Reset Environment&quot;</span><span class="p">)</span>
@@ -488,70 +523,51 @@ document.write(`
         <span class="nd">@reset_button</span><span class="o">.</span><span class="n">on_click</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">_</span><span class="p">(</span><span class="n">_</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
           <span class="bp">self</span><span class="o">.</span><span class="n">request_reset</span><span class="p">()</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">_needs_update</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="c1"># Speed controls.</span>
         <span class="n">speed_buttons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">add_button_group</span><span class="p">(</span>
           <span class="s2">&quot;Speed&quot;</span><span class="p">,</span>
-          <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Slower&quot;</span><span class="p">,</span> <span class="s2">&quot;Faster&quot;</span><span class="p">],</span>
+          <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Slower&quot;</span><span class="p">,</span> <span class="s2">&quot;1x&quot;</span><span class="p">,</span> <span class="s2">&quot;Faster&quot;</span><span class="p">],</span>
         <span class="p">)</span>
 
         <span class="nd">@speed_buttons</span><span class="o">.</span><span class="n">on_click</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">_</span><span class="p">(</span><span class="n">event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
           <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;Slower&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">request_speed_down</span><span class="p">()</span>
+          <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;1x&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request_reset_speed</span><span class="p">()</span>
           <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">request_speed_up</span><span class="p">()</span>
 
-      <span class="c1"># Camera feeds: collect all camera sensors and add to controls tab.</span>
-      <span class="n">camera_sensors</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">sensor</span>
-        <span class="k">for</span> <span class="n">sensor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">sensors</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="n">CameraSensor</span><span class="p">)</span>
-      <span class="p">]</span>
-      <span class="k">if</span> <span class="n">camera_sensors</span><span class="p">:</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">add_folder</span><span class="p">(</span><span class="s2">&quot;Camera Feeds&quot;</span><span class="p">):</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">_camera_viewers</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">ViserCameraViewer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="p">,</span> <span class="n">sensor</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">mj_model</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">sensor</span> <span class="ow">in</span> <span class="n">camera_sensors</span>
-          <span class="p">]</span>
-      <span class="k">else</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_camera_viewers</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="c1"># Let command terms create their own GUI controls.</span>
+      <span class="n">env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span>
+      <span class="k">if</span> <span class="n">env</span><span class="o">.</span><span class="n">command_manager</span><span class="o">.</span><span class="n">active_terms</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">add_folder</span><span class="p">(</span><span class="s2">&quot;Commands&quot;</span><span class="p">):</span>
+          <span class="n">env</span><span class="o">.</span><span class="n">command_manager</span><span class="o">.</span><span class="n">create_gui</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">env_idx</span><span class="p">)</span>
 
-      <span class="c1"># Add standard visualization options from ViserMujocoScene (Environment, Visualization, Contacts, Camera Tracking, Debug Visualization).</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">create_visualization_gui</span><span class="p">(</span>
-        <span class="n">camera_distance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span>
-        <span class="n">camera_azimuth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
-        <span class="n">camera_elevation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">elevation</span><span class="p">,</span>
-      <span class="p">)</span>
+      <span class="c1"># Add standard visualization options from ViserMujocoScene.</span>
+      <span class="k">def</span><span class="w"> </span><span class="nf">_debug_viz_extra</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">command_manager</span><span class="o">.</span><span class="n">create_debug_vis_gui</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="p">)</span>
+
+      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">add_folder</span><span class="p">(</span><span class="s2">&quot;Scene&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">create_visualization_gui</span><span class="p">(</span>
+          <span class="n">camera_distance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">distance</span><span class="p">,</span>
+          <span class="n">camera_azimuth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
+          <span class="n">camera_elevation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">elevation</span><span class="p">,</span>
+          <span class="n">debug_viz_extra_gui</span><span class="o">=</span><span class="n">_debug_viz_extra</span><span class="p">,</span>
+        <span class="p">)</span>
+
+      <span class="bp">self</span><span class="o">.</span><span class="n">_camera_overlays</span> <span class="o">=</span> <span class="n">ViserCameraOverlays</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">mj_model</span><span class="p">)</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_camera_overlays</span><span class="o">.</span><span class="n">has_cameras</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">gui</span><span class="o">.</span><span class="n">add_folder</span><span class="p">(</span><span class="s2">&quot;Camera Feeds&quot;</span><span class="p">):</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">_camera_overlays</span><span class="o">.</span><span class="n">setup_controls</span><span class="p">()</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">_prev_env_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">env_idx</span>
 
-    <span class="c1"># Reward plots tab.</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="p">,</span> <span class="s2">&quot;reward_manager&quot;</span><span class="p">):</span>
-      <span class="k">with</span> <span class="n">tabs</span><span class="o">.</span><span class="n">add_tab</span><span class="p">(</span><span class="s2">&quot;Rewards&quot;</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">viser</span><span class="o">.</span><span class="n">Icon</span><span class="o">.</span><span class="n">CHART_LINE</span><span class="p">):</span>
-        <span class="c1"># Get reward term names and create reward plotter.</span>
-        <span class="n">term_names</span> <span class="o">=</span> <span class="p">[</span>
-          <span class="n">name</span>
-          <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">reward_manager</span><span class="o">.</span><span class="n">get_active_iterable_terms</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">env_idx</span>
-          <span class="p">)</span>
-        <span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_reward_plotter</span> <span class="o">=</span> <span class="n">ViserTermPlotter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="p">,</span> <span class="n">term_names</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Reward&quot;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="p">,</span> <span class="s2">&quot;metrics_manager&quot;</span><span class="p">):</span>
-      <span class="n">term_names</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">name</span>
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">metrics_manager</span><span class="o">.</span><span class="n">get_active_iterable_terms</span><span class="p">(</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">env_idx</span>
-        <span class="p">)</span>
-      <span class="p">]</span>
-      <span class="k">if</span> <span class="n">term_names</span><span class="p">:</span>
-        <span class="k">with</span> <span class="n">tabs</span><span class="o">.</span><span class="n">add_tab</span><span class="p">(</span><span class="s2">&quot;Metrics&quot;</span><span class="p">,</span> <span class="n">icon</span><span class="o">=</span><span class="n">viser</span><span class="o">.</span><span class="n">Icon</span><span class="o">.</span><span class="n">CHART_BAR</span><span class="p">):</span>
-          <span class="c1"># Get metrics term names and create metrics plotter.</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_plotter</span> <span class="o">=</span> <span class="n">ViserTermPlotter</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="p">,</span> <span class="n">term_names</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Metric&quot;</span>
-          <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_term_overlays</span> <span class="o">=</span> <span class="n">ViserTermOverlays</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_term_overlays</span><span class="o">.</span><span class="n">setup_tabs</span><span class="p">(</span><span class="n">tabs</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_debug_overlays</span> <span class="o">=</span> <span class="n">ViserDebugOverlays</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_contact_overlays</span> <span class="o">=</span> <span class="n">ViserContactOverlays</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="p">)</span>
 
     <span class="c1"># Groups tab (geoms and sites).</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">create_groups_gui</span><span class="p">(</span><span class="n">tabs</span><span class="p">)</span></div>
@@ -563,6 +579,7 @@ document.write(`
     <span class="n">had_actions</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_actions</span><span class="p">)</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_process_actions</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">had_actions</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_pending_update_reasons</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">UpdateReason</span><span class="o">.</span><span class="n">ACTION</span><span class="p">)</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_sync_ui_state</span><span class="p">()</span>
 
   <span class="k">def</span><span class="w"> </span><span class="nf">_sync_ui_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -573,6 +590,108 @@ document.write(`
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_update_status_display</span><span class="p">()</span>
 
+  <span class="k">def</span><span class="w"> </span><span class="nf">_update_env_dependent_plots</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Refresh reward/metric plots and histories for the selected environment.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">env_idx</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prev_env_idx</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_prev_env_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">env_idx</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_pending_update_reasons</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">UpdateReason</span><span class="o">.</span><span class="n">ENV_SWITCH</span><span class="p">)</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_term_overlays</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_term_overlays</span><span class="o">.</span><span class="n">on_env_switch</span><span class="p">()</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug_overlays</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_debug_overlays</span><span class="o">.</span><span class="n">on_env_switch</span><span class="p">()</span>
+      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_contact_overlays</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_contact_overlays</span><span class="o">.</span><span class="n">on_env_switch</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_term_overlays</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_term_overlays</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_paused</span><span class="p">)</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_update_camera_feeds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sim</span><span class="p">:</span> <span class="n">Simulation</span><span class="p">,</span> <span class="n">has_pending_updates</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Push camera sensor frames to GUI when needed.&quot;&quot;&quot;</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_camera_overlays</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_update_cameras</span><span class="p">(</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_is_paused</span><span class="p">,</span> <span class="n">has_pending_updates</span>
+    <span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_camera_overlays</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="n">sim</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">env_idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">_scene_offset</span>
+      <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_camera_update_last_ms</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1000.0</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_queue_debug_visualizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Queue environment-specific debug draw calls into the scene.</span>
+
+<span class="sd">    Acquires ``_sim_lock`` so the clear+requeue is atomic with respect</span>
+<span class="sd">    to the background thread that reads the queues in ``scene.update``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug_overlays</span><span class="p">:</span>
+      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sim_lock</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_debug_overlays</span><span class="o">.</span><span class="n">queue</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_debug_queue_last_ms</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1000.0</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_submit_scene_update_if_needed</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">sim</span><span class="p">:</span> <span class="n">Simulation</span><span class="p">,</span> <span class="n">has_pending_updates</span><span class="p">:</span> <span class="nb">bool</span>
+  <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Submit a scene sync job when the update policy allows it.&quot;&quot;&quot;</span>
+    <span class="n">t_enqueue_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">needs_update</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_pending_update_reasons</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">UpdateReason</span><span class="o">.</span><span class="n">SCENE_REQUEST</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_submit_scene_update</span><span class="p">(</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_counter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_paused</span><span class="p">,</span> <span class="n">has_pending_updates</span>
+    <span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_scene_submit_enqueue_last_ms</span> <span class="o">=</span> <span class="mf">0.0</span>
+      <span class="k">return</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_scene</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sim_lock</span><span class="p">:</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">atomic</span><span class="p">():</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene_update_last_ms</span> <span class="o">=</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1000.0</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_threadpool</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">update_scene</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_scene_submit_enqueue_last_ms</span> <span class="o">=</span> <span class="p">(</span>
+      <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">t_enqueue_start</span>
+    <span class="p">)</span> <span class="o">*</span> <span class="mf">1000.0</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_pending_update_reasons</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">needs_update</span> <span class="o">=</span> <span class="kc">False</span>
+
+  <span class="k">def</span><span class="w"> </span><span class="nf">_maybe_log_debug_timings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Log lightweight Viser pipeline timing in debug mode.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbosity</span> <span class="o">&lt;</span> <span class="n">VerbosityLevel</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+      <span class="k">return</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timing_last_log_time</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
+      <span class="k">return</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_timing_last_log_time</span> <span class="o">=</span> <span class="n">now</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+      <span class="p">(</span>
+        <span class="s2">&quot;[DEBUG] Viser timings: &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;camera=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_camera_update_last_ms</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">ms, &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;debug=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_debug_queue_last_ms</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">ms, &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;submit_enqueue=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene_submit_enqueue_last_ms</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">ms, &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;scene_update=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene_update_last_ms</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">ms&quot;</span>
+      <span class="p">),</span>
+      <span class="n">VerbosityLevel</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+    <span class="p">)</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">_should_update_cameras</span><span class="p">(</span><span class="n">paused</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">has_pending_updates</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Camera feeds update continuously while running and on-demand while paused.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="ow">not</span> <span class="n">paused</span><span class="p">)</span> <span class="ow">or</span> <span class="n">has_pending_updates</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span><span class="w"> </span><span class="nf">_should_submit_scene_update</span><span class="p">(</span>
+    <span class="n">counter</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">paused</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">has_pending_updates</span><span class="p">:</span> <span class="nb">bool</span>
+  <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scene submits at 30Hz (every other 60Hz tick) with pause-aware gating.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">counter</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+      <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">paused</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">has_pending_updates</span><span class="p">:</span>
+      <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
 <div class="viewcode-block" id="ViserPlayViewer.sync_env_to_viewer">
 <a class="viewcode-back" href="../../../../source/api/viewer.html#mjlab.viewer.ViserPlayViewer.sync_env_to_viewer">[docs]</a>
   <span class="nd">@override</span>
@@ -580,61 +699,23 @@ document.write(`
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Synchronize environment state to viewer.&quot;&quot;&quot;</span>
     <span class="n">sim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">sim</span>
     <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sim</span><span class="p">,</span> <span class="n">Simulation</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">paused</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_paused</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_counter</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_counter</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_update_status_display</span><span class="p">()</span>
-      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">env_idx</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prev_env_idx</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_prev_env_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">env_idx</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reward_plotter</span><span class="p">:</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">_reward_plotter</span><span class="o">.</span><span class="n">clear_histories</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_plotter</span><span class="p">:</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_plotter</span><span class="o">.</span><span class="n">clear_histories</span><span class="p">()</span>
-        <span class="c1"># Clear debug visualizations when switching environments</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">debug_visualization_enabled</span><span class="p">:</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">clear_debug_all</span><span class="p">()</span>
-
-      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reward_plotter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_paused</span><span class="p">:</span>
-        <span class="n">terms</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">reward_manager</span><span class="o">.</span><span class="n">get_active_iterable_terms</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">env_idx</span>
-          <span class="p">)</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_reward_plotter</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span>
-
-      <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_plotter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_paused</span><span class="p">:</span>
-        <span class="n">terms</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">metrics_manager</span><span class="o">.</span><span class="n">get_active_iterable_terms</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">env_idx</span>
-          <span class="p">)</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_plotter</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">terms</span><span class="p">)</span>
-
-    <span class="c1"># Update camera images</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_camera_viewers</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_paused</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_needs_update</span><span class="p">):</span>
-      <span class="k">for</span> <span class="n">camera_viewer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_camera_viewers</span><span class="p">:</span>
-        <span class="n">camera_viewer</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">env_idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">_scene_offset</span><span class="p">)</span>
-
-    <span class="c1"># Update debug visualizations if enabled</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">debug_visualization_enabled</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="p">,</span> <span class="s2">&quot;update_visualizers&quot;</span>
-    <span class="p">):</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>  <span class="c1"># Clear queued arrows from previous frame</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">update_visualizers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_counter</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-      <span class="k">return</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_paused</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_needs_update</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">needs_update</span><span class="p">:</span>
-      <span class="k">return</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">update_scene</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sim_lock</span><span class="p">:</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">atomic</span><span class="p">():</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sim</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-          <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
-
-    <span class="bp">self</span><span class="o">.</span><span class="n">_threadpool</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">update_scene</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_needs_update</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">needs_update</span> <span class="o">=</span> <span class="kc">False</span></div>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_update_env_dependent_plots</span><span class="p">()</span>
+    <span class="n">has_pending_updates</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pending_update_reasons</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">needs_update</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_update_camera_feeds</span><span class="p">(</span><span class="n">sim</span><span class="p">,</span> <span class="n">has_pending_updates</span><span class="p">)</span>
+    <span class="c1"># Queue debug visualizers only when a scene update will actually be</span>
+    <span class="c1"># submitted.  Clearing the queues on skipped ticks creates a race</span>
+    <span class="c1"># with the background thread that causes debug overlays to blink.</span>
+    <span class="n">will_submit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_submit_scene_update</span><span class="p">(</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_counter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_paused</span><span class="p">,</span> <span class="n">has_pending_updates</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">will_submit</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_queue_debug_visualizers</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_submit_scene_update_if_needed</span><span class="p">(</span><span class="n">sim</span><span class="p">,</span> <span class="n">has_pending_updates</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_maybe_log_debug_timings</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ViserPlayViewer.sync_viewer_to_env">
@@ -652,10 +733,8 @@ document.write(`
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Extend BaseViewer.reset_environment to clear reward and metrics histories.&quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sim_lock</span><span class="p">:</span>
       <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reset_environment</span><span class="p">()</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reward_plotter</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_reward_plotter</span><span class="o">.</span><span class="n">clear_histories</span><span class="p">()</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_plotter</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_plotter</span><span class="o">.</span><span class="n">clear_histories</span><span class="p">()</span></div>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_term_overlays</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_term_overlays</span><span class="o">.</span><span class="n">clear_histories</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ViserPlayViewer.close">
@@ -663,14 +742,13 @@ document.write(`
   <span class="nd">@override</span>
   <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Close the viewer and cleanup resources.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reward_plotter</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_reward_plotter</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
-    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_plotter</span><span class="p">:</span>
-      <span class="bp">self</span><span class="o">.</span><span class="n">_metrics_plotter</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">camera_viewer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_camera_viewers</span><span class="p">:</span>
-      <span class="n">camera_viewer</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_term_overlays</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_term_overlays</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_camera_overlays</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_camera_overlays</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_threadpool</span><span class="o">.</span><span class="n">shutdown</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_external_server</span><span class="p">:</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">_server</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ViserPlayViewer.is_running">
@@ -683,15 +761,24 @@ document.write(`
 
   <span class="k">def</span><span class="w"> </span><span class="nf">_update_status_display</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Update the HTML status display.&quot;&quot;&quot;</span>
-    <span class="n">step_dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">step_dt</span>
-    <span class="n">rt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_smoothed_sps</span> <span class="o">*</span> <span class="n">step_dt</span>
-    <span class="n">rt_display</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rt</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">x&quot;</span> <span class="k">if</span> <span class="n">rt</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;—&quot;</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_status</span><span class="p">()</span>
+    <span class="n">actual_rt</span> <span class="o">=</span> <span class="n">status</span><span class="o">.</span><span class="n">actual_realtime</span>
+    <span class="n">rt_display</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">actual_rt</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">x&quot;</span> <span class="k">if</span> <span class="n">actual_rt</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;—&quot;</span>
+    <span class="n">capped</span> <span class="o">=</span> <span class="s1">&#39; &lt;span style=&quot;color:#e74c3c;&quot;&gt;[CAPPED]&lt;/span&gt;&#39;</span> <span class="k">if</span> <span class="n">status</span><span class="o">.</span><span class="n">capped</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">error_line</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">status</span><span class="o">.</span><span class="n">last_error</span><span class="p">:</span>
+      <span class="c1"># Show last line of traceback to avoid flooding the panel.</span>
+      <span class="n">first_line</span> <span class="o">=</span> <span class="n">status</span><span class="o">.</span><span class="n">last_error</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+      <span class="n">error_line</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s1">&#39;&lt;br/&gt;&lt;span style=&quot;color:#e74c3c;&quot;&gt;&lt;strong&gt;Error:&lt;/strong&gt; </span><span class="si">{</span><span class="n">first_line</span><span class="si">}</span><span class="s1">&lt;/span&gt;&#39;</span>
+      <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_status_html</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">      &lt;div style=&quot;font-size: 0.85em; line-height: 1.25; padding: 0 1em 0.5em 1em;&quot;&gt;</span>
-<span class="s2">        &lt;strong&gt;Status:&lt;/strong&gt; </span><span class="si">{</span><span class="s2">&quot;Paused&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">_is_paused</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">&quot;Running&quot;</span><span class="si">}</span><span class="s2">&lt;br/&gt;</span>
-<span class="s2">        &lt;strong&gt;Steps:&lt;/strong&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_step_count</span><span class="si">}</span><span class="s2">&lt;br/&gt;</span>
-<span class="s2">        &lt;strong&gt;Speed:&lt;/strong&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_time_multiplier</span><span class="si">:</span><span class="s2">.0%</span><span class="si">}</span><span class="s2">&lt;br/&gt;</span>
-<span class="s2">        &lt;strong&gt;Realtime:&lt;/strong&gt; </span><span class="si">{</span><span class="n">rt_display</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_smoothed_fps</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> FPS)</span>
+<span class="s2">        &lt;strong&gt;Status:&lt;/strong&gt; </span><span class="si">{</span><span class="s2">&quot;Paused&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">status</span><span class="o">.</span><span class="n">paused</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">&quot;Running&quot;</span><span class="si">}{</span><span class="n">capped</span><span class="si">}</span><span class="s2">&lt;br/&gt;</span>
+<span class="s2">        &lt;strong&gt;Steps:&lt;/strong&gt; </span><span class="si">{</span><span class="n">status</span><span class="o">.</span><span class="n">step_count</span><span class="si">}</span><span class="s2">&lt;br/&gt;</span>
+<span class="s2">        &lt;strong&gt;Speed:&lt;/strong&gt; </span><span class="si">{</span><span class="n">status</span><span class="o">.</span><span class="n">speed_label</span><span class="si">}</span><span class="s2">&lt;br/&gt;</span>
+<span class="s2">        &lt;strong&gt;Target RT:&lt;/strong&gt; </span><span class="si">{</span><span class="n">status</span><span class="o">.</span><span class="n">target_realtime</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">x&lt;br/&gt;</span>
+<span class="s2">        &lt;strong&gt;Actual RT:&lt;/strong&gt; </span><span class="si">{</span><span class="n">rt_display</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">status</span><span class="o">.</span><span class="n">smoothed_fps</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> FPS)</span><span class="si">{</span><span class="n">error_line</span><span class="si">}</span>
 <span class="s2">      &lt;/div&gt;</span>
 <span class="s2">      &quot;&quot;&quot;</span></div>
 
@@ -742,7 +829,7 @@ By The mjlab Developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Feb 26, 2026.
+  Last updated on Mar 07, 2026.
   <br/>
 </p>
   </div>

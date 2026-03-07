@@ -56,7 +56,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Feb 26, 2026"/>
+    <meta name="docbuild:last-update" content="Mar 07, 2026"/>
   </head>
   
   
@@ -219,6 +219,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../source/training/distributed_training.html">Distributed Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/training/cloud.html">Cloud Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/debugging/nan_guard.html">NaN Guard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/debugging/export_scene.html">Export Scene</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="nav bd-sidenav">
@@ -242,6 +243,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../source/motivation.html">Why mjlab?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/migration_isaac_lab.html">Migrating from Isaac Lab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/faq.html">FAQ &amp; Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/research.html">Research</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/changelog.html">Changelog</a></li>
 </ul>
 
@@ -407,12 +409,14 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab</span><span class="w"> </span><span class="kn">import</span> <span class="n">actuator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.actuator</span><span class="w"> </span><span class="kn">import</span> <span class="n">BuiltinActuatorGroup</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.actuator.actuator</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransmissionType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.actuator.xml_actuator</span><span class="w"> </span><span class="kn">import</span> <span class="n">XmlActuator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.entity.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">EntityData</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">spec_config</span> <span class="k">as</span> <span class="n">spec_cfg</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.utils.lab_api.string</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_matching_names</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.utils.mujoco</span><span class="w"> </span><span class="kn">import</span> <span class="n">dof_width</span><span class="p">,</span> <span class="n">qpos_width</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.utils.spec</span><span class="w"> </span><span class="kn">import</span> <span class="n">auto_wrap_fixed_base_mocap</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.utils.string</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_expr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mjlab.utils.xml</span><span class="w"> </span><span class="kn">import</span> <span class="n">fix_spec_xml</span><span class="p">,</span> <span class="n">strip_buffer_textures</span>
 
 
 <div class="viewcode-block" id="EntityIndexing">
@@ -481,6 +485,11 @@ document.write(`
     <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">mujoco</span><span class="o">.</span><span class="n">MjSpec</span><span class="p">())</span>
   <span class="p">)</span>
   <span class="n">articulation</span><span class="p">:</span> <span class="n">EntityArticulationInfoCfg</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+  <span class="n">sort_actuators</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;When True, reorder actuators so that ``model.ctrl`` follows joint/tendon/site</span>
+<span class="sd">  definition order rather than the order actuators appear in the config. XML actuators</span>
+<span class="sd">  are excluded from sorting and always retain their declaration order.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
 
   <span class="c1"># Editors.</span>
   <span class="n">lights</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">spec_cfg</span><span class="o">.</span><span class="n">LightCfg</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">tuple</span><span class="p">)</span>
@@ -582,14 +591,19 @@ document.write(`
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">articulation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
       <span class="k">return</span>
 
+    <span class="c1"># Collect actuator instances and their targets.</span>
+    <span class="n">pending</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">actuator</span><span class="o">.</span><span class="n">ActuatorCfg</span><span class="p">,</span> <span class="n">actuator</span><span class="o">.</span><span class="n">Actuator</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">actuator_cfg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">articulation</span><span class="o">.</span><span class="n">actuators</span><span class="p">:</span>
       <span class="c1"># Find targets based on transmission type.</span>
       <span class="k">if</span> <span class="n">actuator_cfg</span><span class="o">.</span><span class="n">transmission_type</span> <span class="o">==</span> <span class="n">TransmissionType</span><span class="o">.</span><span class="n">JOINT</span><span class="p">:</span>
         <span class="n">target_ids</span><span class="p">,</span> <span class="n">target_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_joints</span><span class="p">(</span><span class="n">actuator_cfg</span><span class="o">.</span><span class="n">target_names_expr</span><span class="p">)</span>
+        <span class="n">target_spec_names</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_non_free_joints</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">target_ids</span><span class="p">]</span>
       <span class="k">elif</span> <span class="n">actuator_cfg</span><span class="o">.</span><span class="n">transmission_type</span> <span class="o">==</span> <span class="n">TransmissionType</span><span class="o">.</span><span class="n">TENDON</span><span class="p">:</span>
         <span class="n">target_ids</span><span class="p">,</span> <span class="n">target_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_tendons</span><span class="p">(</span><span class="n">actuator_cfg</span><span class="o">.</span><span class="n">target_names_expr</span><span class="p">)</span>
+        <span class="n">target_spec_names</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="o">.</span><span class="n">tendons</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">target_ids</span><span class="p">]</span>
       <span class="k">elif</span> <span class="n">actuator_cfg</span><span class="o">.</span><span class="n">transmission_type</span> <span class="o">==</span> <span class="n">TransmissionType</span><span class="o">.</span><span class="n">SITE</span><span class="p">:</span>
         <span class="n">target_ids</span><span class="p">,</span> <span class="n">target_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_sites</span><span class="p">(</span><span class="n">actuator_cfg</span><span class="o">.</span><span class="n">target_names_expr</span><span class="p">)</span>
+        <span class="n">target_spec_names</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">sites</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">target_ids</span><span class="p">]</span>
       <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
           <span class="sa">f</span><span class="s2">&quot;Invalid transmission_type: </span><span class="si">{</span><span class="n">actuator_cfg</span><span class="o">.</span><span class="n">transmission_type</span><span class="si">}</span><span class="s2">. &quot;</span>
@@ -602,8 +616,52 @@ document.write(`
           <span class="sa">f</span><span class="s2">&quot;expressions: </span><span class="si">{</span><span class="n">actuator_cfg</span><span class="o">.</span><span class="n">target_names_expr</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
       <span class="n">actuator_instance</span> <span class="o">=</span> <span class="n">actuator_cfg</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_ids</span><span class="p">,</span> <span class="n">target_names</span><span class="p">)</span>
-      <span class="n">actuator_instance</span><span class="o">.</span><span class="n">edit_spec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="p">,</span> <span class="n">target_names</span><span class="p">)</span>
       <span class="bp">self</span><span class="o">.</span><span class="n">_actuators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">actuator_instance</span><span class="p">)</span>
+      <span class="n">pending</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">actuator_cfg</span><span class="p">,</span> <span class="n">actuator_instance</span><span class="p">,</span> <span class="n">target_spec_names</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">sort_actuators</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">names</span> <span class="ow">in</span> <span class="n">pending</span><span class="p">:</span>
+        <span class="n">inst</span><span class="o">.</span><span class="n">edit_spec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span>
+      <span class="k">return</span>
+
+    <span class="c1"># Sort actuators so ctrl order matches joint/tendon/site definition order.</span>
+    <span class="c1"># XmlActuators are added first (they wrap pre-existing XML actuators),</span>
+    <span class="c1"># then remaining actuators sorted by transmission type and target order.</span>
+    <span class="n">order_maps</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="n">TransmissionType</span><span class="o">.</span><span class="n">JOINT</span><span class="p">:</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">joint_names</span><span class="p">)},</span>
+      <span class="n">TransmissionType</span><span class="o">.</span><span class="n">TENDON</span><span class="p">:</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tendon_names</span><span class="p">)},</span>
+      <span class="n">TransmissionType</span><span class="o">.</span><span class="n">SITE</span><span class="p">:</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">site_names</span><span class="p">)},</span>
+    <span class="p">}</span>
+    <span class="c1"># Group by transmission type (ordering is conventional, not physics-motivated).</span>
+    <span class="c1"># Within each group, actuators are sorted by their target&#39;s definition order in the</span>
+    <span class="c1"># spec.</span>
+    <span class="n">type_priority</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="n">TransmissionType</span><span class="o">.</span><span class="n">JOINT</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+      <span class="n">TransmissionType</span><span class="o">.</span><span class="n">TENDON</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+      <span class="n">TransmissionType</span><span class="o">.</span><span class="n">SITE</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="c1"># XmlActuators go first in declaration order (they reference actuators already</span>
+    <span class="c1"># present in the spec).</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">names</span> <span class="ow">in</span> <span class="n">pending</span><span class="p">:</span>
+      <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="n">XmlActuator</span><span class="p">):</span>
+        <span class="n">inst</span><span class="o">.</span><span class="n">edit_spec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span>
+
+    <span class="c1"># Flatten remaining actuators to (instance, single_target) pairs and sort.</span>
+    <span class="n">flat</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">actuator</span><span class="o">.</span><span class="n">ActuatorCfg</span><span class="p">,</span> <span class="n">actuator</span><span class="o">.</span><span class="n">Actuator</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">names</span> <span class="ow">in</span> <span class="n">pending</span><span class="p">:</span>
+      <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="n">XmlActuator</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+          <span class="n">flat</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">cfg</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+
+    <span class="n">flat</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span>
+      <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">item</span><span class="p">:</span> <span class="p">(</span>
+        <span class="n">type_priority</span><span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">transmission_type</span><span class="p">],</span>
+        <span class="n">order_maps</span><span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">transmission_type</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)),</span>
+      <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">inst</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">flat</span><span class="p">:</span>
+      <span class="n">inst</span><span class="o">.</span><span class="n">edit_spec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec</span><span class="p">,</span> <span class="p">[</span><span class="n">name</span><span class="p">])</span>
 
   <span class="k">def</span><span class="w"> </span><span class="nf">_add_initial_state_keyframe</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="c1"># If joint_pos is None, use existing keyframe from the model.</span>
@@ -899,9 +957,13 @@ document.write(`
 <div class="viewcode-block" id="Entity.write_xml">
 <a class="viewcode-back" href="../../../source/api/entity.html#mjlab.entity.Entity.write_xml">[docs]</a>
   <span class="k">def</span><span class="w"> </span><span class="nf">write_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xml_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write the MjSpec to disk.&quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">xml_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-      <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">to_xml</span><span class="p">())</span></div>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write the MjSpec to disk.</span>
+
+<span class="sd">    Operates on a copy of the spec to avoid mutating the original.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">strip_buffer_textures</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+    <span class="n">xml_path</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">fix_spec_xml</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">to_xml</span><span class="p">()))</span></div>
 
 
 <div class="viewcode-block" id="Entity.to_zip">
@@ -1585,7 +1647,7 @@ By The mjlab Developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Feb 26, 2026.
+  Last updated on Mar 07, 2026.
   <br/>
 </p>
   </div>

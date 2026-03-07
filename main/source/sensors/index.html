@@ -59,7 +59,7 @@
     <link rel="prev" title="Actuators" href="../actuators.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Feb 26, 2026"/>
+    <meta name="docbuild:last-update" content="Mar 07, 2026"/>
   </head>
   
   
@@ -220,6 +220,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../training/distributed_training.html">Distributed Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../training/cloud.html">Cloud Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging/nan_guard.html">NaN Guard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debugging/export_scene.html">Export Scene</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="nav bd-sidenav">
@@ -243,6 +244,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../motivation.html">Why mjlab?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../migration_isaac_lab.html">Migrating from Isaac Lab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ &amp; Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../research.html">Research</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 </ul>
 
@@ -465,6 +467,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reduction">Reduction</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fields">Fields</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#air-time-tracking">Air time tracking</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#history-decimation-safe-contacts">History (decimation safe contacts)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#output">Output</a></li>
 </ul>
 </li>
@@ -720,6 +723,49 @@ methods provide edge detection for transition events.</p>
 </pre></div>
 </div>
 </section>
+<section id="history-decimation-safe-contacts">
+<span id="contact-sensor-history"></span><h3>History (decimation safe contacts)<a class="headerlink" href="#history-decimation-safe-contacts" title="Link to this heading">#</a></h3>
+<p>When using decimation (multiple physics substeps per policy step), a
+brief collision can occur and resolve entirely within the substep loop.
+By the time the policy reads the sensor, the contact is gone and
+<code class="docutils literal notranslate"><span class="pre">found</span></code> reports zero. Setting <code class="docutils literal notranslate"><span class="pre">history_length</span></code> on the sensor config
+tells the sensor to keep a rolling buffer of the last <em>N</em> substeps for
+force, torque, and distance fields. The policy can then inspect the
+full history and decide whether a real contact occurred.</p>
+<p>Set <code class="docutils literal notranslate"><span class="pre">history_length</span></code> equal to your decimation value so the buffer
+covers exactly one policy step:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ContactSensorCfg</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;self_collision&quot;</span><span class="p">,</span>
+    <span class="n">primary</span><span class="o">=</span><span class="n">ContactMatch</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;subtree&quot;</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;pelvis&quot;</span><span class="p">,</span> <span class="n">entity</span><span class="o">=</span><span class="s2">&quot;robot&quot;</span><span class="p">),</span>
+    <span class="n">secondary</span><span class="o">=</span><span class="n">ContactMatch</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;subtree&quot;</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="s2">&quot;pelvis&quot;</span><span class="p">,</span> <span class="n">entity</span><span class="o">=</span><span class="s2">&quot;robot&quot;</span><span class="p">),</span>
+    <span class="n">fields</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;found&quot;</span><span class="p">,</span> <span class="s2">&quot;force&quot;</span><span class="p">),</span>
+    <span class="n">history_length</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>  <span class="c1"># matches decimation=4</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The history tensors live on <code class="docutils literal notranslate"><span class="pre">ContactData</span></code> alongside the regular
+fields:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">data</span>
+<span class="n">data</span><span class="o">.</span><span class="n">force_history</span>   <span class="c1"># [B, N, H, 3]  (H = history_length)</span>
+<span class="n">data</span><span class="o">.</span><span class="n">torque_history</span>  <span class="c1"># [B, N, H, 3]</span>
+<span class="n">data</span><span class="o">.</span><span class="n">dist_history</span>    <span class="c1"># [B, N, H]</span>
+</pre></div>
+</div>
+<p>Index 0 is the most recent substep. To check whether any substep had
+a contact force above a threshold:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">force_mag</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">force_history</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># [B, N, H]</span>
+<span class="n">had_contact</span> <span class="o">=</span> <span class="p">(</span><span class="n">force_mag</span> <span class="o">&gt;</span> <span class="mf">10.0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># [B]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">track_air_time=True</span></code> already accumulates contact state across
+substeps for gait rewards, so feet ground sensors typically do not
+need <code class="docutils literal notranslate"><span class="pre">history_length</span></code>. Use history for sensors where you need to
+detect brief collisions that would otherwise be missed (self
+collisions, illegal contact terminations).</p>
+</div>
+</section>
 <section id="output">
 <h3>Output<a class="headerlink" href="#output" title="Link to this heading">#</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">ContactData</span></code> is a dataclass whose fields correspond to the
@@ -841,6 +887,7 @@ reference implementations for custom sensor development.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reduction">Reduction</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fields">Fields</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#air-time-tracking">Air time tracking</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#history-decimation-safe-contacts">History (decimation safe contacts)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#output">Output</a></li>
 </ul>
 </li>
@@ -880,7 +927,7 @@ By The mjlab Developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Feb 26, 2026.
+  Last updated on Mar 07, 2026.
   <br/>
 </p>
   </div>

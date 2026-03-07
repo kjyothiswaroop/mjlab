@@ -56,7 +56,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Feb 26, 2026"/>
+    <meta name="docbuild:last-update" content="Mar 07, 2026"/>
   </head>
   
   
@@ -219,6 +219,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../source/training/distributed_training.html">Distributed Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/training/cloud.html">Cloud Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/debugging/nan_guard.html">NaN Guard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/debugging/export_scene.html">Export Scene</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="nav bd-sidenav">
@@ -242,6 +243,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../source/motivation.html">Why mjlab?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/migration_isaac_lab.html">Migrating from Isaac Lab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/faq.html">FAQ &amp; Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source/research.html">Research</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../source/changelog.html">Changelog</a></li>
 </ul>
 
@@ -412,18 +414,23 @@ document.write(`
   <span class="k">class</span><span class="w"> </span><span class="nc">OriginType</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The frame in which the camera position and target are defined.&quot;&quot;&quot;</span>
 
+    <span class="n">AUTO</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Track the first non-fixed body, or fall back to a free camera.&quot;&quot;&quot;</span>
     <span class="n">WORLD</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The origin of the world.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Free camera at the configured lookat point.&quot;&quot;&quot;</span>
     <span class="n">ASSET_ROOT</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The center of the asset defined by entity_name.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Track the root body of the asset defined by entity_name.&quot;&quot;&quot;</span>
     <span class="n">ASSET_BODY</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">auto</span><span class="p">()</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The center of the body defined by body_name in asset defined by entity_name.&quot;&quot;&quot;</span></div>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Track the body defined by body_name in the asset defined by</span>
+<span class="sd">    entity_name.&quot;&quot;&quot;</span></div>
 
 
-  <span class="n">origin_type</span><span class="p">:</span> <span class="n">OriginType</span> <span class="o">=</span> <span class="n">OriginType</span><span class="o">.</span><span class="n">WORLD</span>
+  <span class="n">origin_type</span><span class="p">:</span> <span class="n">OriginType</span> <span class="o">=</span> <span class="n">OriginType</span><span class="o">.</span><span class="n">AUTO</span>
   <span class="n">entity_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
   <span class="n">body_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
   <span class="n">env_idx</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="n">max_extra_envs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="w">  </span><span class="sd">&quot;&quot;&quot;Number of neighboring environments to render around ``env_idx``.&quot;&quot;&quot;</span>
   <span class="n">enable_reflections</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
   <span class="n">enable_shadows</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
   <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">240</span>
@@ -476,7 +483,7 @@ By The mjlab Developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Feb 26, 2026.
+  Last updated on Mar 07, 2026.
   <br/>
 </p>
   </div>

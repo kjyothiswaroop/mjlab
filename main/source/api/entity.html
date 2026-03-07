@@ -59,7 +59,7 @@
     <link rel="prev" title="mjlab.sim" href="sim.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-    <meta name="docbuild:last-update" content="Feb 26, 2026"/>
+    <meta name="docbuild:last-update" content="Mar 07, 2026"/>
   </head>
   
   
@@ -220,6 +220,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../training/distributed_training.html">Distributed Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../training/cloud.html">Cloud Training</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../debugging/nan_guard.html">NaN Guard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../debugging/export_scene.html">Export Scene</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="current nav bd-sidenav">
@@ -243,6 +244,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../motivation.html">Why mjlab?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../migration_isaac_lab.html">Migrating from Isaac Lab</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ &amp; Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../research.html">Research</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 </ul>
 
@@ -500,6 +502,7 @@ document.write(`
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.entity.EntityCfg.init_state"><code class="docutils literal notranslate"><span class="pre">EntityCfg.init_state</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.entity.EntityCfg.spec_fn"><code class="docutils literal notranslate"><span class="pre">EntityCfg.spec_fn</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.entity.EntityCfg.articulation"><code class="docutils literal notranslate"><span class="pre">EntityCfg.articulation</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.entity.EntityCfg.sort_actuators"><code class="docutils literal notranslate"><span class="pre">EntityCfg.sort_actuators</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.entity.EntityCfg.lights"><code class="docutils literal notranslate"><span class="pre">EntityCfg.lights</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.entity.EntityCfg.cameras"><code class="docutils literal notranslate"><span class="pre">EntityCfg.cameras</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.entity.EntityCfg.textures"><code class="docutils literal notranslate"><span class="pre">EntityCfg.textures</span></code></a></li>
@@ -702,6 +705,7 @@ adjustable position and orientation.</p>
 <dt class="sig sig-object py" id="mjlab.entity.Entity.write_xml">
 <span class="sig-name descname"><span class="pre">write_xml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xml_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><span class="pre">Path</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../../_modules/mjlab/entity/entity.html#Entity.write_xml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mjlab.entity.Entity.write_xml" title="Link to this definition">#</a></dt>
 <dd><p>Write the MjSpec to disk.</p>
+<p>Operates on a copy of the spec to avoid mutating the original.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1051,6 +1055,14 @@ None, all environments are set.</p></li>
 <dt class="sig sig-object py" id="mjlab.entity.EntityCfg.articulation">
 <span class="sig-name descname"><span class="pre">articulation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#mjlab.entity.EntityArticulationInfoCfg" title="mjlab.entity.EntityArticulationInfoCfg"><span class="pre">EntityArticulationInfoCfg</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#mjlab.entity.EntityCfg.articulation" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mjlab.entity.EntityCfg.sort_actuators">
+<span class="sig-name descname"><span class="pre">sort_actuators</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#mjlab.entity.EntityCfg.sort_actuators" title="Link to this definition">#</a></dt>
+<dd><p>When True, reorder actuators so that <code class="docutils literal notranslate"><span class="pre">model.ctrl</span></code> follows joint/tendon/site
+definition order rather than the order actuators appear in the config. XML actuators
+are excluded from sorting and always retain their declaration order.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="mjlab.entity.EntityCfg.lights">
@@ -1549,6 +1561,7 @@ All inputs/outputs use world frame.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.entity.EntityCfg.init_state"><code class="docutils literal notranslate"><span class="pre">EntityCfg.init_state</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.entity.EntityCfg.spec_fn"><code class="docutils literal notranslate"><span class="pre">EntityCfg.spec_fn</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.entity.EntityCfg.articulation"><code class="docutils literal notranslate"><span class="pre">EntityCfg.articulation</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.entity.EntityCfg.sort_actuators"><code class="docutils literal notranslate"><span class="pre">EntityCfg.sort_actuators</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.entity.EntityCfg.lights"><code class="docutils literal notranslate"><span class="pre">EntityCfg.lights</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.entity.EntityCfg.cameras"><code class="docutils literal notranslate"><span class="pre">EntityCfg.cameras</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mjlab.entity.EntityCfg.textures"><code class="docutils literal notranslate"><span class="pre">EntityCfg.textures</span></code></a></li>
@@ -1665,7 +1678,7 @@ By The mjlab Developers
   
   <div class="footer-item">
     <p class="last-updated">
-  Last updated on Feb 26, 2026.
+  Last updated on Mar 07, 2026.
   <br/>
 </p>
   </div>
