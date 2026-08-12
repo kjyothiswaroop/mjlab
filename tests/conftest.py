@@ -1,5 +1,9 @@
 """Shared test fixtures and utilities."""
 
+# Import mjlab first: its package __init__ sets MUJOCO_GL and, on Jetson
+# (aarch64), preloads native libs the torch wheel needs before it's imported.
+import mjlab  # noqa: F401, I001
+
 import os
 from pathlib import Path
 

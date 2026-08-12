@@ -10,6 +10,10 @@ import sys
 if sys.platform.startswith("linux"):
   os.environ.setdefault("MUJOCO_GL", "egl")
 
+import ctypes
+import glob
+import platform
+import sysconfig
 import traceback
 from importlib.metadata import entry_points
 from pathlib import Path
@@ -31,6 +35,39 @@ TYRO_FLAGS = (
   # Helps with wandb sweep compatibility: https://brentyi.github.io/tyro/wandb_sweeps/
   tyro.conf.UsePythonSyntaxForLiteralCollections,
 )
+
+
+def _preload_jetson_native_libs() -> None:
+  """Preload NVPL/cuDSS libs needed by the Jetson (aarch64) CUDA torch wheel.
+
+  That wheel dynamically links against NVPL (Arm Performance Libraries) and
+  cuDSS but, unlike its other CUDA libs, doesn't declare them as dependencies
+  torch can preload itself, so `import torch` fails with a bare
+  `libnvpl_lapack_lp64_gomp.so.0: cannot open shared object file` unless
+  these are loaded first. Setting LD_LIBRARY_PATH doesn't help here since
+  it's only consulted by the dynamic linker at process start, not for
+  ctypes/dlopen calls issued after Python is already running, so we preload
+  the .so files directly by absolute path instead. Must run before anything
+  imports torch, i.e. before `_import_registered_packages`.
+  """
+  if not (sys.platform.startswith("linux") and platform.machine() == "aarch64"):
+    return
+
+  site_packages = Path(sysconfig.get_paths()["purelib"])
+  for name in ("libnvpl_blas_lp64_gomp.so.0", "libnvpl_lapack_lp64_gomp.so.0"):
+    path = site_packages / "nvpl" / "lib" / name
+    if path.exists():
+      try:
+        ctypes.CDLL(str(path), mode=ctypes.RTLD_GLOBAL)
+      except OSError:
+        pass
+
+  cudss_glob = str(site_packages / "nvidia" / "cu*" / "lib" / "libcudss.so*")
+  for lib_path in sorted(glob.glob(cudss_glob)):
+    try:
+      ctypes.CDLL(lib_path, mode=ctypes.RTLD_GLOBAL)
+    except OSError:
+      pass
 
 
 def _configure_warp() -> None:
@@ -70,6 +107,7 @@ def _configure_mediapy() -> None:
   mediapy.set_ffmpeg(imageio_ffmpeg.get_ffmpeg_exe())
 
 
+_preload_jetson_native_libs()
 _configure_warp()
 _configure_mediapy()
 _import_registered_packages()

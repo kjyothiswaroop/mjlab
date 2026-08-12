@@ -34,6 +34,12 @@ dependencies = [
   "tqdm",
   "tyro>=1.0.1",
   "torch>=2.7.0",
+  # NVPL/cuDSS: native libs the Jetson (aarch64) CUDA torch wheel needs but
+  # doesn't declare as installable dependencies itself. Preloaded via ctypes
+  # in mjlab/__init__.py before torch is imported.
+  "nvpl-lapack; sys_platform == 'linux' and platform_machine == 'aarch64'",
+  "nvpl-blas; sys_platform == 'linux' and platform_machine == 'aarch64'",
+  "nvidia-cudss-cu13; sys_platform == 'linux' and platform_machine == 'aarch64'",
   "torchrunx>=0.3.4",
   "warp-lang>=1.14.0",
   "mujoco-warp~=3.11.0",
@@ -91,8 +97,8 @@ docs = [
 ]
 
 [project.optional-dependencies]
-cu128 = ["torch>=2.7.0"]
-cpu = ["torch>=2.7.0"]
+cu128 = ["torch>=2.7.0; platform_machine != 'aarch64'"]
+cpu = ["torch>=2.7.0; platform_machine != 'aarch64'"]
 
 [tool.uv]
 conflicts = [
@@ -105,6 +111,12 @@ constraint-dependencies = [
 required-environments = [
   "sys_platform == 'darwin' and platform_machine == 'arm64'",
   "sys_platform == 'linux' and platform_machine == 'x86_64'",
+  "sys_platform == 'linux' and platform_machine == 'aarch64'",
+]
+environments = [
+  "sys_platform == 'darwin' and platform_machine == 'arm64'",
+  "sys_platform == 'linux' and platform_machine == 'x86_64'",
+  "sys_platform == 'linux' and platform_machine == 'aarch64'",
 ]
 
 [[tool.uv.index]]
@@ -125,9 +137,18 @@ name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
+[[tool.uv.index]]
+name = "jetson"
+url = "https://pypi.jetson-ai-lab.io/sbsa/cu130"
+explicit = true
+
 [tool.uv.sources]
 warp-lang = { index = "nvidia", marker = "sys_platform != 'darwin'" }
 torch = [
+  # Unconditional (no extra required): aarch64 Linux has exactly one sane
+  # torch build, so route it automatically instead of defaulting to CPU
+  # like x86_64/darwin do when no --extra is passed.
+  { index = "jetson", marker = "sys_platform == 'linux' and platform_machine == 'aarch64'" },
   { index = "pytorch-cu128", extra = "cu128", marker = "sys_platform != 'darwin'" },
   { index = "pytorch-cpu", extra = "cpu", marker = "sys_platform != 'darwin'" },
 ]

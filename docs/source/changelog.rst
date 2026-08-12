@@ -5,6 +5,18 @@ Changelog
 Upcoming version (not yet released)
 -----------------------------------
 
+Added
+^^^^^
+
+- ``uv sync``/``uv run`` now install a CUDA-enabled ``torch`` build on
+  NVIDIA Jetson (aarch64) boards from the
+  `Jetson AI Lab <https://pypi.jetson-ai-lab.io>`_ index, instead of
+  silently falling back to a CPU-only build with no GPU acceleration. No
+  extra flag needed. mjlab's package init also preloads the NVPL/cuDSS
+  native libs that build needs but doesn't declare as installable
+  dependencies, so ``import torch`` doesn't fail with a missing ``.so``
+  error after installing.
+
 Version 1.6.0 (August 8, 2026)
 ------------------------------
 
